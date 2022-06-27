@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Akbocado - 로그인{% endblock title %}
+
+{% block main %}
+<div id="banner-wrapper">
+    <section id="banner" class="container">
+        <div class="row">
+            <div id="content" class="col-12">
+
+                <header class="major">
+                    <h2>로그인</h2>
+                </header>
+                <section class="col-8 col-12-narrower">
+                    <form method="post" action="{% url 'User:login' %}" id='loginform'>
+                        {% csrf_token %}
+                        <div class="row gtr-50 gtr-uniform">
+                            <div class="col-12">
+                                <input type="text" name="userid" id="userid" placeholder="아이디" />
+                            </div>
+                            <div class="col-12">
+                                <input type="password" name="password" id="password" placeholder="비밀번호" />
+                            </div>
+                            <div class="col-12">
+                                <ul class="actions" style='justify-content: center;'>
+                                    <li><input type='submit' class="button alt2 col-6" style='border: 2px solid white;' value='로그인'/></li>
+                                    <li><a href="{% url 'User:join' %}" class="button alt2 col-6" style='border: 2px solid white;'>회원가입</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock  %}

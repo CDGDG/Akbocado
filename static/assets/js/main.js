@@ -1,24 +1,21 @@
 /*
-	Inverse by Pixelarity
+	Iconic by Pixelarity
 	pixelarity.com | hello@pixelarity.com
 	License: pixelarity.com/license
 */
 
 (function($) {
 
-	var	$window	= $(window),
-		$header	= $('#header'),
-		$body	= $('body');
+	var	$window = $(window),
+		$body = $('body');
 
 	// Breakpoints.
 		breakpoints({
-			default:   ['1681px',   null       ],
-			xlarge:    ['1281px',   '1680px'   ],
-			large:     ['981px',    '1280px'   ],
-			medium:    ['737px',    '980px'    ],
-			small:     ['481px',    '736px'    ],
-			xsmall:    ['361px',    '480px'    ],
-			xxsmall:   [null,       '360px'    ]
+			wide:      [ '1281px',  '1680px' ],
+			normal:    [ '981px',   '1280px' ],
+			narrow:    [ '841px',   '980px'  ],
+			narrower:  [ '737px',   '840px'  ],
+			mobile:    [ null,      '736px'  ]
 		});
 
 	// Play initial animations on page load.
@@ -30,23 +27,32 @@
 
 	// Dropdowns.
 		$('#nav > ul').dropotron({
-			alignment: 'right',
-			hideDelay: 350,
-			baseZIndex: 100000
+			baseZIndex: 10000,
+			offsetY: -16,
+			offsetX: -1,
+			mode: 'fade',
+			noOpenerFade: true
 		});
 
-	// Menu.
-		$('<a href="#navPanel" class="navPanelToggle"><span>Menu</span></a>')
-			.appendTo($header);
+	// Nav Panel.
 
-		$(
-			'<div id="navPanel">' +
-				'<nav>' +
-					$('#nav') .navList() +
-				'</nav>' +
-				'<a href="#navPanel" class="close"></a>' +
-			'</div>'
-		)
+		// Title Bar.
+			$(
+				'<div id="titleBar">' +
+					'<a href="#navPanel" class="toggle"></a>' +
+					'<span class="title">' + $('#logo').html() + '</span>' +
+				'</div>'
+			)
+				.appendTo($body);
+
+		// Panel.
+			$(
+				'<div id="navPanel">' +
+					'<nav>' +
+						$('#nav').navList() +
+					'</nav>' +
+				'</div>'
+			)
 				.appendTo($body)
 				.panel({
 					delay: 500,
@@ -54,9 +60,9 @@
 					hideOnSwipe: true,
 					resetScroll: true,
 					resetForms: true,
+					side: 'left',
 					target: $body,
-					visibleClass: 'is-navPanel-visible',
-					side: 'right'
+					visibleClass: 'navPanel-visible'
 				});
 
 })(jQuery);

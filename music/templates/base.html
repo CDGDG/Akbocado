@@ -1,96 +1,67 @@
 <!DOCTYPE HTML>
 <!--
-	Inverse by Pixelarity
+	Iconic by Pixelarity
 	pixelarity.com | hello@pixelarity.com
 	License: pixelarity.com/license
 -->
-<html lang='kor'>
+<html>
 	<head>
 		<title>{% block title %}{% endblock  %}</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<link rel="stylesheet" href="/static/assets/css/main.css"/>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
-		<script src="https://kit.fontawesome.com/c0bcdc1f96.js" crossorigin="anonymous"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-		{% comment %} <script src="/static/chat.js"></script> {% endcomment %}
+		<link rel="stylesheet" href="/static/assets/css/main.css" />
 	</head>
-	<body class="is-preload">
+	<body class="homepage is-preload">
+		<div id="page-wrapper">
 
-		<!-- Header -->
-			<header id="header" class="alt" style='padding:1rem;'>
-				<a style='display:flex;' class="logo" href="/"><img width='45' height='45' src="/static/images/MANGO.png" alt='MANGO'><p style='margin: auto;'>Akbocado</p></a>
-				<nav id="nav">
-					{% comment %} <ul>
-						{% if request.session.user %}
-							<li>
-								<a class="dropdown">{{request.session.user.userid}}</a>
+			<!-- Header Wrapper -->
+			<div id="header-wrapper">
+
+				<!-- Header -->
+					<div id="header" class="container">
+
+						<!-- Logo -->
+							<h1><a href="{% url 'home' %}" id="logo">Akbocado</a></h1>
+
+						<!-- Nav -->
+							<nav id="nav">
 								<ul>
-									<li><a href="{% url 'User:logout' %}">logout</a></li>
+									{% if request.session.user %}
+										<li>
+											<a class="dropdown">{{request.session.user.userid}}</a>
+											<ul>
+												<li><a href="{% url 'User:logout' %}">로그아웃</a></li>
+												<li><a href="{% url 'User:logout' %}">내 악보</a></li>
+											</ul>
+										</li>
+									{% else %}
+										<li><a href="{% url 'User:login' %}">로그인</a></li>
+									{% endif %}
 								</ul>
-							</li>
-						{% else %}
-							<li><a href="{% url 'User:login' %}">Login</a></li>
-						{% endif %}
-					</ul> {% endcomment %}
-				</nav>
-			</header>
-			{% block banner %}{% endblock  %}
+							</nav>
 
-            {% block contents %}{% endblock  %}
-
-
-		<!-- Footer -->
-			<div id="footer">
-				<div class="wrapper style2">
-					<div class="inner">
-						<header class="major">
-							<h2>Akbocado <sub>by</sub><strong>어무해</strong></h2>
-						</header>
-						<div class="content">
-							<ul class="icons" style='width: 100%;'>
-								<li>
-									<span class="icon solid fa-star"></span>
-									<div>
-										<strong>조동건</strong>
-									</div>
-								</li>
-								<li>
-									<span class="icon solid fa-star"></span>
-									<div>
-										<strong>김정현</strong>
-									</div>
-								</li>
-								<li>
-									<span class="icon solid fa-star"></span>
-									<div>
-										<strong>김혜원</strong>
-									</div>
-								</li>
-								<li>
-									<span class="icon solid fa-star"></span>
-									<div>
-										<strong>이정수</strong>
-									</div>
-								</li>
-								<li style='margin: 0 5px;'>
-									<span class="icon solid fa-star"></span>
-									<div>
-										<strong>이창준</strong>
-									</div>
-								</li>
-							</ul>
-						</div>
 					</div>
-					<div class="copyright">
-						&copy; Korea IT academy. All rights reserved. Lorem ipsum dolor sit amet.
-					</div>
-				</div>
+
 			</div>
+
+			<div id="main-wrapper">
+				{% block main %}{% endblock  %}
+			</div>
+
+			<div id="featured-wrapper">
+				<section id='featured' class='container'>
+					<div class="title">
+						<span>Akbocado</span>
+					</div>
+				</section>
+			</div>
+
+			<!-- Copyright -->
+				<div id="copyright">
+					&copy; Untitled. All rights reserved.
+				</div>
+
+		</div>
 
 		<!-- Scripts -->
 			<script src="/static/assets/js/jquery.min.js"></script>
@@ -99,22 +70,6 @@
 			<script src="/static/assets/js/breakpoints.min.js"></script>
 			<script src="/static/assets/js/util.js"></script>
 			<script src="/static/assets/js/main.js"></script>
-
 	</body>
-	{% block script %}{% endblock  %}
-	<style>
-		ul.icons{
-			width: 100%;
-			display: flex;
-			justify-content: center;
-		}
-		
-		ul.icons li{
-			display: inline-block;
-			float: left;
-			height: 100%;
-			width: 33%;
-			margin: 0 5px;
-		}
-	</style>
+	{% block script %}{% endblock %}
 </html>

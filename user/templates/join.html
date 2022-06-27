@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Akbocado - 회원가입{% endblock  %}
+{% block main %}
+<div id="banner-wrapper">
+    <section id="banner" class="container">
+        <div class="row">
+            <div id="content" class="col-12">
+
+                <header class="major">
+                    <h2>회원가입</h2>
+                </header>
+                <section class="col-8 col-12-narrower">
+                    <form method="post" action="{% url 'User:join' %}">
+                        {% csrf_token %}
+                        {{form.as_p}}
+                        <button class='button primary fit'>작성 완료</button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function(){
+
+        id_flag = false
+        pw_flag = false
+        repw_flag = false
+
+        // 아이디 중복검사
+        // .attr({'data-bs-original-title': '중복된 아이디입니다.'}).tooltip("show");
+        $('#id_userid').focus(function(){
+            id_flag = false
+        })
+        $('#id_userid').change(function(){
+            id = $('#id_userid').val().trim()
+            if(id.length < 5){
+                $('label[for=id_userid]').html('아이디: 최소 5글자 이상 입니다.').css({'color': 'red'})
+                id_flag = false
+            }
+            else{
+                $.ajax({
+                    url: "{% url 'User:checkid' %}",
+                    data: {'userid': id},
+                    datatype:'json',
+                    success: function(response){
+                        if(response.data == 'not exist'){
+                            $('label[for=id_userid]').html('아이디: 사용 가능한 아이디 입니다.').css({'color': 'white'})
+                            id_flag = true
+                            return;
+                        }else{
+                            $('label[for=id_userid]').html('아이디: 중복된 아이디 입니다.').css({'color': 'red'})
+                            id_flag = false
+                            return;
+                        }
+                    }
+                })
+            }
+        })
+        // 비밀번호 검사
+        $('#id_password').focus(function(){
+            pw_flag = false
+            repw_flag = false
+        })
+        $('#id_password').change(function(){
+            pw = $(this).val().trim()
+            if(!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(pw)){
+                $('label[for=id_password]').html('비밀번호: 유효하지 않은 비밀번호 입니다.').css({'color': 'red'})
+                pw_flag = false
+            }else{
+                $('label[for=id_password]').html('비밀번호: 사용 가능한 비밀번호 입니다.').css({'color': 'white'})
+                pw_flag = true
+            }
+
+            repw = $("#id_re_password").val().trim()
+            if(pw != repw){
+                $('label[for=id_re_password]').html('비밀번호 확인: 비밀번호가 일치하지 않습니다.').css({'color': 'red'})
+                repw_flag = false
+            }else{
+                $('label[for=id_re_password]').html('비밀번호 확인: 확인되었습니다.').css({'color': 'white'})
+                repw_flag = true
+            }
+        })
+        // 비밀번호 확인 검사
+        $('#id_re_password').focus(function(){
+            pw_flag = false
+            repw_flag = false
+        })
+        $('#id_re_password').change(function(){
+            repw = $(this).val().trim()
+            if(pw != repw){
+                $('label[for=id_re_password]').html('비밀번호 확인: 비밀번호가 일치하지 않습니다.').css({'color': 'red'})
+                repw_flag = false
+            }else{
+                $('label[for=id_re_password]').html('비밀번호 확인: 확인되었습니다.').css({'color': 'white'})
+                repw_flag = true
+            }
+        })
+    })
+</script>
+<style>
+    p{
+        text-align: left;
+    }
+    .checked{
+        color:#ff8b77;
+    }
+</style>
+{% endblock  %}
