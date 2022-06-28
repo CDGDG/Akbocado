@@ -4,4 +4,5 @@ from . import views
 app_name = 'Music'
 
 urlpatterns = [
+    path('analyze/', views.analyze, name='analyze'),
 ]

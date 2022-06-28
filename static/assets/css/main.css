@@ -2338,7 +2338,7 @@ input, select, textarea {
 		padding: 10em 0 7em;
 	}
 
-		.homepage #main-wrapper:before {
+		/* .homepage #main-wrapper:before {
 			content: '';
 			display: block;
 			position: absolute;
@@ -2348,7 +2348,7 @@ input, select, textarea {
 			height: 100%;
 			background: url("images/highlight.png") no-repeat center center;
 			background-size: 100% 100%;
-		}
+		} */
 
 	#footer-wrapper {
 		position: relative;

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block main %}
+<div id="banner-wrapper">
+    <section id="banner" class="container">
+        <div class="row">
+            <div id="content" class="col-12">
+
+                <header class="major">
+                    <h2>악보 분석 결과</h2>
+                </header>
+                <section class="col-8 col-12-narrower">
+                    <div class="row">
+                        <div class="col-6 col-12-narrower">
+                            {{image.img}}
+                        </div>
+                        <div class="col-6 col-12-narrower">
+                            {{title}}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock  %}
