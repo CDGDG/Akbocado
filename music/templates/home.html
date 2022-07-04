@@ -78,7 +78,27 @@
     }
 
     function uploadFiles(e){
-        $('#akboform').submit()
+        var akboImage = $('#akb')[0].files[0]
+        var formdata = new FormData();
+        formdata.append('file',akboImage);
+        formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}')
+        console.log(formdata)
+        $.ajax({
+            url: "{% url 'Music:checkImage' %}",
+            processData : false,
+            contentType: false,
+            type: "POST",
+            data: formdata,
+            success:function(response){
+                console.log(response.data)
+                if(response.data == '악보'){
+                    $('#akboform').submit();
+                }else{
+                    alert('악보가 맞나요?ㅠㅠ');
+                    return;
+                }
+            }
+        })
     }
 </script>
 {% endblock  %}

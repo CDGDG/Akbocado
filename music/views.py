@@ -1,9 +1,18 @@
+from anyio import open_file
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
 from django.shortcuts import render
 from matplotlib import artist
 import requests
 from music.models import Input
+
+from tensorflow.keras.models import load_model
+import PIL.ImageOps as ops
+from PIL import Image
+import numpy as np
+import cv2 
+
+model = load_model('model/akbo_model_200.h5')
 
 def home(request):
     return render(request, 'home.html')
@@ -111,3 +120,36 @@ def getMelonArtist(artist):
     except Exception as e:
         return ('아티스트 정보 불러오기 실패', e)
     return data
+
+
+
+def checkAkboImage(request):
+    akbo = "악보"
+    akboImage = request.FILES.get('file')
+    print(type(akboImage))
+    img = akboImage.read()
+    image = cv2.imdecode(np.frombuffer(img , np.uint8), cv2.IMREAD_UNCHANGED)
+    # print("==========",img,"=============")
+    print(predict(image))
+    if predict(image) == 1:
+        print("=========악보 아님==============")
+        akbo = "일반"
+    return JsonResponse({'data': akbo})
+
+
+
+
+def predict(file):
+    class_names = [0,1]
+    # img = cv2.imread(file)
+    image = Image.fromarray(file)
+    mono8img = image.convert('L')
+    invImg = ops.invert(mono8img)
+    resizeImg = invImg.resize((200, 200))
+    list(resizeImg.getdata())[:10]
+    dataImg = list(map(lambda n: int(n)/255, list(resizeImg.getdata())))
+    data_arr = np.array(dataImg).reshape(1, 200, 200, 1)
+    preds = model.predict(data_arr)
+
+    return class_names[np.argmax(preds[0])]
+    

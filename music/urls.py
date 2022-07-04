@@ -5,5 +5,6 @@ app_name = 'Music'
 
 urlpatterns = [
     path('analyze/', views.analyze, name='analyze'),
-    path('search/', views.search, name='search')
+    path('search/', views.search, name='search'),
+    path('checkImage/',views.checkAkboImage, name='checkImage'),
 ]
