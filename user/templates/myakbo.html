@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Akbocado - 내 악보{% endblock title %}
+
+{% block main %}
+<div id="banner-wrapper">
+    <section id="banner" class="container">
+        <div class="row">
+            <div id="content" class="col-12">
+                <header class="major">
+                    <h2>{{request.session.user.userid}} 님의 악보</h2>
+                </header>
+            </div>
+            <ul class="pennants">
+                {% for akbo in akbos %}
+                <li data="{{akbo.id}}">
+                    <img src="{{akbo.image.url}}" alt="" style='width: 10em;'>
+                    <h3>{{akbo.title}}</h3>
+                    <p>{{akbo.artist}}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+</div>
+{% endblock  %}
+{% block script %}
+<style>
+    ul.pennants li{
+        border: 2px solid white;
+        border-radius: 1em;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    ul.pennants li:hover{
+        background-color: rgba(255,255,255,0.5);
+        width: 16em;
+        padding: 1.3em;
+    }
+</style>
+<script>
+    $('li').click(function(){
+        pk=$(this).attr('data')
+        location.href = "{% url 'User:akboinfo' pk=12345 %}".replace(/12345/, pk)
+    })
+</script>
+{% endblock script %}

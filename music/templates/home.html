@@ -12,10 +12,10 @@
                     <img src="/static/icon.png" alt="" style='width: 30%;'>
                 </header>
                 <section class="col-8 col-12-narrower">
-                    <form action="{% url 'Music:analyze' %}" method="post" id='akboform' class='dropzone' enctype="multipart/form-data">
+                    <form action="{% url 'Music:analyze' %}" method="post" id='akboform' class='dropzone' enctype="multipart/form-data" style='position:relative;'>
                         {% csrf_token %}
-                        {% comment %} <label for="akbo" id='akb'>파일을 업로드해주세요.</label> {% endcomment %}
-                        <input type="file" name="akbo" id="akb" style=''>
+                        <label for="akbo" id='akbo'>파일을 업로드해주세요.</label>
+                        <input type="file" name="akbo" id="akb" style='color:transparent;'>
                     </form>
                 </section>
             </div>
@@ -25,6 +25,14 @@
 {% endblock  %}
 {% block script %}
 <style>
+    #akbo{
+        position: absolute;
+        left: 40%;
+        top: 45%;
+        width: 20%;
+        color: #4D8E58;
+        font-weight: bold;
+    }
     #akb{
         outline: 2px dashed #4D8E58;
         outline-offset:-40px;  
@@ -36,13 +44,13 @@
         margin: 10% auto;
         border-radius: 1em;
         display: block;
-        padding: 17% 0;
-        color: #4D8E58;
-        font-weight: bold;
     }
     #akb:hover{
         background-color: gray;
         outline-offset: -5px;
+    }
+    #akb::file-selector-button {
+        display: none;
     }
 </style>
 <script>
@@ -51,7 +59,7 @@
     .on("dragleave", dragOver)
     .on("drop", uploadFiles);
 
-    $('#akbo').change(uploadFiles)
+    $('#akb').change(uploadFiles)
  
     function dragOver(e){
         e.stopPropagation();
@@ -68,32 +76,9 @@
             });
         }
     }
-    
+
     function uploadFiles(e){
-        e.stopPropagation();
-        e.preventDefault();
-
-        e.dataTransfer = e.originalEvent.dataTransfer; //2
-        var files = e.target.files || e.dataTransfer.files;
-    
-        if (files.length > 1) {
-            alert('파일을 하나만 올려주세요!');
-            $(e.target).css({
-                "background-color": "lightgray",
-                "outline-offset": "-40px"
-            });
-            return;
-        }
-
-        // let formData = new FormData();
-// 
-        // const request = new XMLHttpRequest();
-        // request.open("POST", "{% url 'Music:analyze' %}");
-        // formData.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]')[0].value)
-        // formData.append("akbo", files[0]);
-        // request.send(formData)
-
-        // $('#akboform').submit()
+        $('#akboform').submit()
     }
 </script>
 {% endblock  %}

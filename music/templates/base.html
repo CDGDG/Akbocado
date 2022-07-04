@@ -11,7 +11,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/static/assets/css/main.css" />
 	</head>
-	<body class="homepage is-preload">
+	<body class="homepage is-preload" style='position: relative;'>
+		{% block modal %}{% endblock  %}
 		<div id="page-wrapper">
 
 			<!-- Header Wrapper -->
@@ -31,7 +32,7 @@
 											<a class="dropdown">{{request.session.user.userid}}</a>
 											<ul>
 												<li><a href="{% url 'User:logout' %}">로그아웃</a></li>
-												<li><a href="{% url 'User:logout' %}">내 악보</a></li>
+												<li><a href="{% url 'User:myakbo' %}">내 악보</a></li>
 											</ul>
 										</li>
 									{% else %}

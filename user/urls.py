@@ -8,4 +8,7 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('join/', views.join, name='join'),
     path('checkid/', views.checkid, name='checkid'),
+    path('myakbo/', views.myakbo, name='myakbo'),
+    path('save/', views.save, name='save'),
+    path('akboinfo/<int:pk>/', views.akboinfo, name='akboinfo')
 ]

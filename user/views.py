@@ -3,7 +3,8 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.hashers import make_password, check_password
 from user.forms import JoinForm
 
-from user.models import User
+from user.models import Akbo, User
+from music.models import Input
 
 def login(request):
     if request.method == 'GET':
@@ -62,4 +63,32 @@ def checkid(request):
 
     return JsonResponse(context)
 
+def myakbo(request):
+    user = User.objects.get(id=request.session.get('user').get('id'))
+    akbos = Akbo.objects.filter(user=user)
+    return render(request, 'myakbo.html', {'akbos': akbos})
 
+def save(request):
+    title = request.GET.get('title')
+    artist = request.GET.get('artist')
+    lyrics = request.GET.get('lyrics')
+    image = request.GET.get('image')
+    print('저장하기 ----')
+    print('제목:', title)
+    print('아티스트:', artist)
+    print('가사:', lyrics)
+    print('이미지:', image)
+    akbo = Akbo(
+        user=User.objects.get(id=request.session.get('user').get('id')),
+        title=title,
+        artist=artist,
+        image=Input.objects.get(id=image).img,
+    )
+    akbo.save()
+    return JsonResponse({'data': 'success'})
+
+def akboinfo(request, pk):
+    akbo = Akbo.objects.get(id=pk)
+    print('내 악보정보-----')
+    print('akbo')
+    return render(request, 'akboinfo.html', {'akbo': akbo})
