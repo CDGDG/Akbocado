@@ -2,6 +2,15 @@
 
 {% block title %}Akbocado - 악보OCR{% endblock  %}
 
+{% block modal %}
+<div id='mo' style='position: absolute; background-color: rgba(0,0,0,0.5); width: 100%; height:100%; z-index: 200000;display: none;'>
+    <div id="resultmodal" class='modal'>
+        <h2>이미지 분석 중</h2>
+        <img src="" alt="" id='inputimage'>
+    </div>
+</div>
+{% endblock  %}
+
 {% block main %}
 <div id="banner-wrapper">
     <section id="banner" class="container">
@@ -24,7 +33,58 @@
 </div>
 {% endblock  %}
 {% block script %}
+<link rel="stylesheet" href="/static/live-border.css">
+<script src="/static/live-border.js"></script>
 <style>
+    .modal{
+        width: 500px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #343e49;
+        border: 3px solid white;
+        position: fixed;
+        border-radius: 1em;
+        overflow: hidden;
+    }
+    .close{
+        position:absolute; 
+        color: white;
+        right: 1%;
+        font-size: xx-large;
+        font-weight: bold;
+    }
+    .close:hover{
+        color: #4D8E58;
+        font-size: xxx-large;
+    }
+    .modal h2, .modal h3, .modal h4{
+        color: white;
+        text-align: center;
+        margin: 50px 0;
+    }
+    .modal img{
+        width: 100%;
+        padding: 20%;
+        border-radius: 1em;
+    }
+    thead td{
+        font-weight: bold;
+    }
+    .modal td{
+        padding: 3%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 50%;
+        text-align: center;
+    }
+    ul li p{
+        color: white;
+        text-align: center;
+    }
+
+
     #akbo{
         position: absolute;
         left: 40%;
@@ -79,6 +139,12 @@
 
     function uploadFiles(e){
         var akboImage = $('#akb')[0].files[0]
+
+        // 로딩 화면 만들기
+        readURL($('#akb')[0])
+        $('#mo').show()
+
+        // 혜원 - 악보확인 ajax
         var formdata = new FormData();
         formdata.append('file',akboImage);
         formdata.append('csrfmiddlewaretoken', '{{ csrf_token }}')
@@ -94,11 +160,25 @@
                 if(response.data == '악보'){
                     $('#akboform').submit();
                 }else{
-                    alert('악보가 맞나요?ㅠㅠ');
-                    return;
+                    alert('악보가 아닙니다.\n악보를 선택해주세요.');
+                    location.reload();
                 }
             }
         })
     }
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            document.getElementById('inputimage').src = e.target.result;
+          };
+          reader.readAsDataURL(input.files[0]);
+        } else {
+          document.getElementById('inputimage').src = "";
+        }
+    }
+
+    $("#inputimage").liveBorder({top:true, bottom:false});
 </script>
 {% endblock  %}
