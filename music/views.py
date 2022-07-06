@@ -14,6 +14,7 @@ import cv2
 from .OCR.lyrics import getLyrics
 
 from io import BytesIO
+import base64
 
 model = load_model('model/akbo_model_200.h5')
 
@@ -22,6 +23,33 @@ def home(request):
 
 def index(request):
     return render(request, 'index.html')
+
+def analyze_title(request):
+    # original = Input.objects.get(pk = request.POST.get('img_id'))
+    # image = original.img
+    # akbo_image = cv2.imdecode(np.frombuffer(image.read() , np.uint8), cv2.IMREAD_UNCHANGED)
+    pass
+
+
+def analyze_lyrics(request):
+    lyrics = None
+    print("======================",request.GET.get('img_id'))
+    original = Input.objects.get(pk = request.GET.get('img_id'))
+    image = original.img
+    akbo_image = cv2.imdecode(np.frombuffer(image.read() , np.uint8), cv2.IMREAD_UNCHANGED)
+    lyrics, lyrics_imgs = getLyrics(akbo_image)
+    lyrics_uri = [to_data_uri(l) for l in lyrics_imgs]
+
+    lyrics = lyrics or '알 수 없음'
+    context = {
+        'lyrics': lyrics,
+        'lyrics_uri' : lyrics_uri,
+    }
+
+    return JsonResponse(context)
+
+
+
 
 def analyze(request):
     akbo = None; title = None; artist = None; lyrics = None
@@ -44,9 +72,14 @@ def analyze(request):
 
     akbo_image = cv2.imdecode(np.frombuffer(buffer , np.uint8), cv2.IMREAD_UNCHANGED)
 
+
     # 가사 분석
     lyrics, lyrics_imgs = getLyrics(akbo_image)
 
+    lyrics_uri = [to_data_uri(l) for l in lyrics_imgs]
+
+
+    
     title = title or '인스타그램'
     artist = artist or '딘'
     lyrics = lyrics or '알 수 없음'
@@ -56,7 +89,10 @@ def analyze(request):
         'title': title,
         'artist': artist,
         'lyrics': lyrics,
+        'lyrics_uri' : lyrics_uri,
     }
+
+    print("=================",original.pk)
 
     return render(request, 'result.html', context)
 
@@ -162,6 +198,12 @@ def predict(file):
 
     return class_names[np.argmax(preds[0])]
 
+def to_data_uri(img):
+    image = Image.fromarray(img)
+    data = BytesIO()
+    image.save(data, "png") # pick your format
+    data64 = base64.b64encode(data.getvalue())
+    return u'data:img/png;base64,'+data64.decode('utf-8') 
 
 
 
