@@ -45,7 +45,7 @@ def analyze(request):
     akbo_image = cv2.imdecode(np.frombuffer(buffer , np.uint8), cv2.IMREAD_UNCHANGED)
 
     # 가사 분석
-    lyrics = getLyrics(akbo_image)
+    lyrics, lyrics_imgs = getLyrics(akbo_image)
 
     title = title or '인스타그램'
     artist = artist or '딘'

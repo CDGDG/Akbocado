@@ -10,19 +10,10 @@ def getLyrics(img_ori):
     # height, width, channel = img_ori.shape
 
     gray = cv2.cvtColor(img_ori, cv2.COLOR_BGR2GRAY)
-    img_thresh = cv2.adaptiveThreshold(
-        gray,
-        maxValue = 255.0,
-        adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-        thresholdType=cv2.THRESH_BINARY_INV,
-        blockSize=19,
-        C=9,
+    img_thresh = cv2.adaptiveThreshold(gray, maxValue = 255.0, adaptiveMethod=cv2.ADAPTIVE_THRESH_GAUSSIAN_C, thresholdType=cv2.THRESH_BINARY_INV, C=9,
+        blockSize=57,
     )
-    contours, _ = cv2.findContours(
-        img_thresh,
-        mode=cv2.RETR_LIST,
-        method=cv2.CHAIN_APPROX_SIMPLE,
-    )
+    contours, _ = cv2.findContours(img_thresh, mode=cv2.RETR_LIST, method=cv2.CHAIN_APPROX_SIMPLE)
 
     contours_dict = []
 
@@ -40,7 +31,7 @@ def getLyrics(img_ori):
         })
 
     OLINE_MIN_AREA = 25000
-    OLINE_MIN_RATIO, OLINE_MAX_RATIO = 8, 15
+    OLINE_MIN_RATIO, OLINE_MAX_RATIO = 7, 25
     oline_contours = []
     cnt = 0
     for d in contours_dict:
@@ -107,7 +98,7 @@ def getLyrics(img_ori):
         matched_result.append(np.take(possible_contours, idx_list))
 
     PLATE_WIDTH_PADDING = 1.2
-    PLATE_HEIGHT_PADDING = 1.5
+    PLATE_HEIGHT_PADDING = 1.7;
 
     MIN_PLATE_RARIO = 0
     MAX_PLATE_RATIO = 100
@@ -162,7 +153,7 @@ def getLyrics(img_ori):
         # threshhold 이진화
         _, plate_img = cv2.threshold(
             plate_img,
-            thresh=200,
+            thresh=120,
             maxval=255.0,
             type=cv2.THRESH_BINARY,
         )
@@ -182,18 +173,18 @@ def getLyrics(img_ori):
 
             area = w * h # 면적과
             ratio = w / h # 가로세로 비율 구하고
-            if 0.3 < ratio < 1.2 \
+            if 0.3 < ratio < 1.4 \
             and area < 25000:
                 if x < plate_min_x: plate_min_x = x
                 if y < plate_min_y: plate_min_y = y
                 if x + w > plate_max_x: plate_max_x = x + w
                 if y + h > plate_max_y: plate_max_y = y + h
 
-        img_result = plate_img[plate_min_y: plate_max_y, plate_min_x: plate_max_x]
+        img_result = plate_img[plate_min_y: plate_max_y, plate_min_x-50: plate_max_x+50]
         if not img_result.any():
             plate_chars.append('')
             continue
-        img_result = cv2.GaussianBlur(img_result, ksize=(7, 7), sigmaX=0)
+        img_result = cv2.GaussianBlur(img_result, ksize=(3, 3), sigmaX=0)
         _, img_result = cv2.threshold(
             img_result,
             thresh=0.0,
@@ -215,7 +206,7 @@ def getLyrics(img_ori):
         chars = pytesseract.image_to_string(
             img_result,
             lang='kor',
-            config= '--psm 7 --oem 2'
+            config= '--oem 2'
         )
         result_chars = ''
         for c in chars:
@@ -224,4 +215,4 @@ def getLyrics(img_ori):
 
         plate_chars.append(result_chars)
 
-    return plate_chars
+    return plate_chars, lyrics_senc
