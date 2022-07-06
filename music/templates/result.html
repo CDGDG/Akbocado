@@ -72,7 +72,9 @@
                                 <li>
                                     <div class='col-12'>
                                         <h3>가사</h3>
-                                        <p>{{lyrics}}</p>
+                                        {% for l in lyrics %}
+                                        <p>{{l}}</p>
+                                        {% endfor %}
                                     </div>
                                 </li>
                                 <li class='col-12'>
