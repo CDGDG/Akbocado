@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
-import functions as fs
-import recognition_modules as rs
+from . import functions as fs
+from . import recognition_modules as rs
 
 def remove_noise(image):
     image = fs.threshold(image)  # 이미지 이진화
