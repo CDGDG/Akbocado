@@ -202,6 +202,7 @@ def getLyrics(img_ori):
         )
 
         lyrics_senc.append(img_result)
+
         # OCR 문자 인식
         chars = pytesseract.image_to_string(
             img_result,
