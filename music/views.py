@@ -5,8 +5,8 @@ from django.shortcuts import render
 from matplotlib import artist
 import requests
 from music.models import Input
-import functions as fs
-import modules
+from . import functions as fs
+from . import modules
 
 from tensorflow.keras.models import load_model
 import PIL.ImageOps as ops
@@ -26,30 +26,43 @@ def home(request):
 def index(request):
     return render(request, 'index.html')
 
-def analyze_title(request):
-    # original = Input.objects.get(pk = request.POST.get('img_id'))
-    # image = original.img
-    # akbo_image = cv2.imdecode(np.frombuffer(image.read() , np.uint8), cv2.IMREAD_UNCHANGED)
-    pass
 
-
-def analyze_lyrics(request):
-    lyrics = None
-    print("======================",request.GET.get('img_id'))
+def analyze_type(request,type):
     original = Input.objects.get(pk = request.GET.get('img_id'))
     image = original.img
-    akbo_image = cv2.imdecode(np.frombuffer(image.read() , np.uint8), cv2.IMREAD_UNCHANGED)
-    lyrics, lyrics_imgs = getLyrics(akbo_image)
-    lyrics_uri = [to_data_uri(l) for l in lyrics_imgs]
-
-    lyrics = lyrics or '알 수 없음'
-    context = {
-        'lyrics': lyrics,
-        'lyrics_uri' : lyrics_uri,
-    }
+    akbo_image = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_UNCHANGED)
+    if type == 'title':
+        title= None
+        # title,title_imgs =
+        # lyrics_uri = [to_data_uri(l) for l in title_imgs]
+        title = title or '인스타그램'
+        context = {
+            'type':type,
+            'title':title,
+            # 'title_uri': title_uri
+            }
+    elif type == 'artist':
+        artist = None
+        # artist, artist_imgs =
+        # artist_uri = [to_data_uri(l) for l in artist_imgs]
+        artist = artist or '딘'
+        context = {
+            'type' : type,
+            'artist': artist,
+            # 'artist_uri' : artist_uri,
+        }
+    else:
+        lyrics = None
+        lyrics, lyrics_imgs = getLyrics(akbo_image)
+        lyrics_uri = [to_data_uri(l) for l in lyrics_imgs]
+        lyrics = lyrics or '알 수 없음'
+        context = {
+            'type' : type,
+            'lyrics': lyrics,
+            'lyrics_uri' : lyrics_uri,
+        }
 
     return JsonResponse(context)
-
 
 
 
@@ -75,20 +88,13 @@ def analyze(request):
     akbo_image = cv2.imdecode(np.frombuffer(buffer , np.uint8), cv2.IMREAD_UNCHANGED)
 
     # 음표 분석
-    image_1 = modules.remove_noise(akbo_image) # 1. 보표 영역 추출 및 그 외 노이즈 제거
-    image_2, staves = modules.remove_staves(image_1) # 2. 오선 제거
-    image_3, staves = modules.normalization(image_2, staves, 10) # 3. 악보 이미지 정규화
-    image_4, objects = modules.object_detection(image_3, staves) # 4. 객체 검출 과정
-    image_5, objects = modules.object_analysis(image_4, objects) # 5. 객체 분석 과정
-    image_6, key, beats, pitches = modules.recognition(image_5, staves, objects) # 6. 인식 과정
-
-    # 가사 분석
-    lyrics, lyrics_imgs = getLyrics(akbo_image)
-
-    lyrics_uri = [to_data_uri(l) for l in lyrics_imgs]
-
-
-    
+    # image_1 = modules.remove_noise(akbo_image) # 1. 보표 영역 추출 및 그 외 노이즈 제거
+    # image_2, staves = modules.remove_staves(image_1) # 2. 오선 제거
+    # image_3, staves = modules.normalization(image_2, staves, 10) # 3. 악보 이미지 정규화
+    # image_4, objects = modules.object_detection(image_3, staves) # 4. 객체 검출 과정
+    # image_5, objects = modules.object_analysis(image_4, objects) # 5. 객체 분석 과정
+    # image_6, key, beats, pitches = modules.recognition(image_5, staves, objects) # 6. 인식 과정
+  
     title = title or '인스타그램'
     artist = artist or '딘'
     lyrics = lyrics or '알 수 없음'
@@ -96,11 +102,8 @@ def analyze(request):
         'image': image,
         'original': original,
         'title': title,
-        'artist': artist,
-        'lyrics': lyrics,
-        'lyrics_uri' : lyrics_uri,
+        'artist': artist
     }
-
     print("=================",original.pk)
 
     return render(request, 'result.html', context)

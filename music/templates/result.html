@@ -2,10 +2,11 @@
 
 {% block modal %}
 <div id='mo' style='position: absolute; background-color: rgba(0,0,0,0.5); width: 100%; height:100%; z-index: 200000;display: none;'>
-    <div id="resultmodal" class="modal">
+    <div id="resultmodal" class="modal result_modal">
         <span class='close'>&times;</span>
-        <h2></h2>
         <img src="" alt="">
+        <h2>분석 결과</h2>
+        <h4 id='result'><p  style='margin:0;min-height:3%;'></p></h4>
     </div>
     <div id="artistmodal" class='modal'>
         <span class='close'>&times;</span>
@@ -24,7 +25,7 @@
                 <tbody id='artisttrack'>
                 </tbody>
             </table>
-        </div>
+        </div>``
     </div>
     <div id='trackmodal' class='modal'>
         <span class="close">&times;</span>
@@ -65,23 +66,19 @@
                             <ul class="profiles five" id='info'>
                                 <li class="first">
                                     <div class="col-12">
-                                        {% comment %} <h3><a href="javascript:analyze_title()">제목 확인하기</a></h3> {% endcomment %}
-                                        <p><a href="javascript:search('track', '{{title}}', '{{artist}}')" class='info'>{{title}}</a></p>
-                                        {% comment %} <img src="{{lyrics_uri}}"> {% endcomment %}
+                                        <h3><a href="javascript:analyze_type('title')" class = 'button'>제목 확인하기</a></h3>
+                                        {% comment %} <p><a href="javascript:search('track', '{{title}}', '{{artist}}')" class='info'>{{title}}</a></p> {% endcomment %}
                                     </div>
                                 </li>
                                 <li>
                                     <div class='col-12'>
-                                        <h3>아티스트</h3>
-                                        <p><a href="javascript:search('artist', '{{artist}}', '{{artist}}')" class='info'>{{artist}}</a></p>
+                                        <h3><a href="javascript:analyze_type('artist')" class='button'>아티스트 확인하기</a></h3>
+                                        {% comment %} <p><a href="javascript:search('artist', '{{artist}}', '{{artist}}')" class='info'>{{artist}}</a></p> {% endcomment %}
                                     </div>
                                 </li>
                                 <li>
                                     <div class='col-12'>
-                                        <h3><a href="javascript:analyze_lyrics()">가사 확인하기</a></h3>
-                                        {% for l in lyrics %}
-                                        <p>{{l}}</p>
-                                        {% endfor %}
+                                        <h3><a href="javascript:analyze_type('lyrics')" class='button'>가사 확인하기</a></h3>
                                     </div>
                                 </li>
                                 <li class='col-12'>
@@ -223,6 +220,7 @@
                             .append($(`<td>${track.artist}</td>`))
                         )
                     }
+                    $('#artistmodal').show()
                 }else if(type=='track'){
                     $(`#trackimage`).attr('src', response['image'])
                     $(`#trackname`).text(response['track'])
@@ -231,26 +229,49 @@
                     for(let lyric of response['lyrics']){
                         $('#tracklyrics').append($(`<p style='margin:0;min-height:3%;'>${lyric}</p>`))
                     }
+                    $('#trackmodal').show()
                 }
+            }
+        })
+    }
+
+    function analyze_type(type){
+        var img_id = $('#img_id').val()
+        console.log(img_id)
+        $.ajax({
+            url:'{% url "Music:analyze_type" type=12345 %}'.replace(/12345/, type),
+            type:'GET',
+            data: {'img_id':img_id},
+            dataType:'JSON',
+            success:function(response){
+                if(response.type == 'title'){
+                    $('#result').html('')
+                    console.log(response.title)
+                    $('#resultmodal > h2').text('제목 분석 결과')
+                    $('#result').append($(`<a href="javascript:search('title', '${response.title}', '')" style='margin:0;min-height:3%;'>${response.title}</a>`))
+                }else if(response.type == 'artist'){
+                    $('#result').html('')
+                    console.log(response.artist)
+                    $('#resultmodal > h2').text('가수 분석 결과')
+                    $('#result').append($(`<a href="javascript:search('artist', '${response.artist}', '${response.artist}')" style='margin:0;min-height:3%;'>${response.artist}</a>`))
+                }else{
+                    $('#result').html('')
+                    for(i=0; i<response.lyrics.length; i++){
+                        console.log(response.lyrics[i])
+                        $('#resultmodal > h2').text('가사 분석 결과')
+                        $('#result').append($(`<p style='margin:0;min-height:3%;'>${response.lyrics[i]}</p>`))
+                    }
+                }
+                $('.modal').hide()
+                $('#resultmodal').show()
                 $('#mo').toggle()
             }
         })
     }
 
 
-    function analyze_lyrics(){
-        var img_id = $('#img_id').val()
-        console.log(img_id)
-        $.ajax({
-            url:'{% url "Music:analyze_lyrics" %}',
-            type:'GET',
-            data: {'img_id':img_id},
-            dataType:'json',
-            success:function(response){
-                console.log(response.lyrics) 
-            }
-        })
-    }
+
+
 
 </script>
 {% endblock  %}
