@@ -5,8 +5,8 @@ from django.shortcuts import render
 from matplotlib import artist
 import requests
 from music.models import Input
-import functions as fs
-import modules
+from . import functions as fs
+from . import modules
 
 from tensorflow.keras.models import load_model
 import PIL.ImageOps as ops

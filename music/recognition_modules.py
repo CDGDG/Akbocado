@@ -1,4 +1,4 @@
-import functions as fs
+from . import functions as fs
 
 def recognize_key(image, staves, stats):
     (x, y, w, h, area) = stats
