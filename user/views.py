@@ -82,6 +82,7 @@ def save(request):
         user=User.objects.get(id=request.session.get('user').get('id')),
         title=title,
         artist=artist,
+        lyrics=lyrics,
         image=Input.objects.get(id=image).img,
     )
     akbo.save()

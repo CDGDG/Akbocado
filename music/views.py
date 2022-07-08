@@ -122,39 +122,29 @@ def search(request):
             context['image'] = melon_data['image']
             context['artist'] = melon_data['artist']
             context['tracks'] = melon_data['tracks']
-        elif type=='track':
+        elif type=='title':
             melon_data = getMelonInfo(item, artist)
-            context['album'] = melon_data['album']
-            context['release'] = melon_data['release']
-            context['image'] = melon_data['image']
-            context['track'] = melon_data['track']
-            context['artist'] = melon_data['artist']
-            context['artists'] = melon_data['artist']
-            context['lyrics'] = melon_data['lyrics']
+            context['track'] = item
+            context['tracks'] = melon_data
     except IndexError as ie:
         context['error'] = 'IndexError'
 
     return JsonResponse(context)
 
 def getMelonInfo(track, artist):
-    query = f'{track} {artist}'
+    query = f'{track}'
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36'
     }
     q_url = 'https://www.melon.com/search/song/index.htm?q='+query
     try:
-        trackid = BeautifulSoup(requests.get(q_url, headers=headers).text, 'html.parser').select_one('table tbody tr td div.wrap.pd_none.left input')['value']
-        url = 'https://www.melon.com/song/detail.htm?songId='+trackid
-        soup = BeautifulSoup(requests.get(url, headers=headers).text, 'html.parser')
-        data = {
-            'album': soup.select_one('dl.list > dd').text.strip(),
-            'release': soup.select('dl.list > dd')[1].text.strip(),
-            'image': soup.select_one('div.wrap_info > div.thumb > a > img')['src'].strip(),
-            'track': soup.select_one('div.info > div.song_name').text.replace('곡명', '').strip(),
-            'artist': soup.select_one('div.info > div.artist > a.artist_name > span').text.strip(),
-            'lyrics': BeautifulSoup(str(soup.select_one('#d_video_summary')).replace('<br/>', '\n'), 'html.parser').text.split('\n'),
-            }
+        tracks = BeautifulSoup(requests.get(q_url, headers=headers).text, 'html.parser').select('table tbody tr')
+        data = [{
+            'title': soup.select_one('.ellipsis a.fc_gray').text.strip(),
+            'artist': soup.select_one('#artistName > a,fc_mgray').text.strip(),
+            'album': soup.select_one('.ellipsis:not(#artistName) a.fc_mgray').text,
+            } for soup in tracks]
     except Exception as e:
         return ('곡 정보 불러오기 실패', e)
     return data

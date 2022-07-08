@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
 {% block modal %}
-<div id='mo' style='position: absolute; background-color: rgba(0,0,0,0.5); width: 100%; height:100%; z-index: 200000;display: none;'>
-    <div id="resultmodal" class="modal result_modal">
+<div id='mo' style='position: absolute; background-color: rgba(0,0,0,0.5); width: 100%; height:100%; z-index: 20000;display: none;'>
+    <div id="resultmodal" class="modal result_modal" style='z-index: 20001'>
         <span class='close'>&times;</span>
         <img src="" alt="">
         <h2>분석 결과</h2>
         <h4 id='result'><p  style='margin:0;min-height:3%;'></p></h4>
     </div>
-    <div id="artistmodal" class='modal'>
+    <div id="artistmodal" class='modal'  style='z-index: 20002'>
         <span class='close'>&times;</span>
         <img src="" alt="" id='artistimage'>
         <h2 id='artistname'></h2>
@@ -25,25 +25,25 @@
                 <tbody id='artisttrack'>
                 </tbody>
             </table>
-        </div>``
+        </div>
     </div>
-    <div id='trackmodal' class='modal'>
+    <div id='trackmodal' class='modal' style='z-index: 20002'>
         <span class="close">&times;</span>
-        <img src="" alt="" id="trackimage">
         <h2 id="trackname"></h2>
-        <ul class="profiles">
-            <li class="first">
-                <h3>앨범</h3>
-                <p id='trackalbum'></p>
-            </li>
-            <li>
-                <h3>발매</h3>
-                <p id='trackrelease'></p>
-            </li>
-            <li id='tracklyrics'>
-                <h3>가사</h3>
-            </li>
-        </ul>
+        <hr>
+        <div class="table-wrapper">
+            <h4>인기곡</h4>
+            <table class="alt" style='color: white;'>
+                <thead>
+                    <tr>
+                        <th>title</th>
+                        <th>artist</th>
+                    </tr>
+                </thead>
+                <tbody id='titletrack'>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock  %}
@@ -67,18 +67,19 @@
                                 <li class="first">
                                     <div class="col-12">
                                         <h3><a href="javascript:analyze_type('title')" class = 'button'>제목 확인하기</a></h3>
-                                        {% comment %} <p><a href="javascript:search('track', '{{title}}', '{{artist}}')" class='info'>{{title}}</a></p> {% endcomment %}
+                                        <p><a href="javascript:search('title', $('#titleinfo').text(), '')" class='info' id='titleinfo'></a></p>
                                     </div>
                                 </li>
                                 <li>
                                     <div class='col-12'>
                                         <h3><a href="javascript:analyze_type('artist')" class='button'>아티스트 확인하기</a></h3>
-                                        {% comment %} <p><a href="javascript:search('artist', '{{artist}}', '{{artist}}')" class='info'>{{artist}}</a></p> {% endcomment %}
+                                        <p><a href="javascript:search('artist', $('#artistinfo').text(), '')" class='info' id='artistinfo'></a></p>
                                     </div>
                                 </li>
                                 <li>
                                     <div class='col-12'>
                                         <h3><a href="javascript:analyze_type('lyrics')" class='button'>가사 확인하기</a></h3>
+                                        <div class='info' id='lyricsinfo'></div>
                                     </div>
                                 </li>
                                 <li class='col-12'>
@@ -115,7 +116,7 @@
         overflow-x: auto;
     }
     .close{
-        position:absolute; 
+        position:fixed; 
         color: white;
         right: 1%;
         font-size: xx-large;
@@ -142,7 +143,7 @@
     .modal td{
         padding: 3%;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        {% comment %} white-space: nowrap; {% endcomment %}
         overflow: hidden;
         width: 50%;
         text-align: center;
@@ -182,9 +183,9 @@
                 url: "{% url 'User:save' %}",
                 type: 'GET',
                 data: {
-                    'title': '{{title}}',
-                    'artist': '{{artist}}',
-                    'lyrics': '{{lyrics}}',
+                    'title': $('#titleinfo').text(),
+                    'artist': $('#artistinfo').text(),
+                    'lyrics': $('#lyricsinfo').text(),
                     'image': '{{image.id}}',
                 },
                 dataType: 'JSON',
@@ -209,7 +210,6 @@
             success: function(response){
                 console.log(response)
 
-                
                 if(type=='artist'){
                     $(`#${type}image`).attr('src', response['image'])
                     $(`#${type}name`).text(response['artist'])
@@ -221,16 +221,18 @@
                         )
                     }
                     $('#artistmodal').show()
-                }else if(type=='track'){
-                    $(`#trackimage`).attr('src', response['image'])
+                }else if(type=='title'){
                     $(`#trackname`).text(response['track'])
-                    $(`#trackalbum`).text(response['album'])
-                    $(`#trackrelease`).text(response['release'])
-                    for(let lyric of response['lyrics']){
-                        $('#tracklyrics').append($(`<p style='margin:0;min-height:3%;'>${lyric}</p>`))
+                    for(track of response.tracks){
+                        $('#titletrack').append(
+                            $('<tr></tr>')
+                            .append($(`<td>${track.title}</td>`))
+                            .append($(`<td>${track.artist}</td>`))
+                        )
                     }
                     $('#trackmodal').show()
                 }
+                $('#mo').show()
             }
         })
     }
@@ -249,17 +251,21 @@
                     console.log(response.title)
                     $('#resultmodal > h2').text('제목 분석 결과')
                     $('#result').append($(`<a href="javascript:search('title', '${response.title}', '')" style='margin:0;min-height:3%;'>${response.title}</a>`))
+                    $('#titleinfo').text(response.title)
                 }else if(response.type == 'artist'){
                     $('#result').html('')
                     console.log(response.artist)
                     $('#resultmodal > h2').text('가수 분석 결과')
-                    $('#result').append($(`<a href="javascript:search('artist', '${response.artist}', '${response.artist}')" style='margin:0;min-height:3%;'>${response.artist}</a>`))
+                    $('#result').append($(`<a href="javascript:search('artist', '${response.artist}', '')" style='margin:0;min-height:3%;'>${response.artist}</a>`))
+                    $('#artistinfo').text(response.artist)
                 }else{
                     $('#result').html('')
+                    lyricstext = ''
+                    $('#resultmodal > h2').text('가사 분석 결과')
                     for(i=0; i<response.lyrics.length; i++){
                         console.log(response.lyrics[i])
-                        $('#resultmodal > h2').text('가사 분석 결과')
                         $('#result').append($(`<p style='margin:0;min-height:3%;'>${response.lyrics[i]}</p>`))
+                        $('#lyricsinfo').append($(`<p style='margin:0;min-height:3%;'>${response.lyrics[i]}</p>`))
                     }
                 }
                 $('.modal').hide()
