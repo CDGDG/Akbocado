@@ -2,6 +2,14 @@ import cv2
 import pytesseract
 import numpy as np
 from .OCR import find_chars
+from io import BytesIO
+import base64
+from PIL import Image
+import os
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/keys/akbocado-5c075ac55e91.json"
+from google.cloud import vision
+
+client = vision.ImageAnnotatorClient()
 
 def getLyrics(img_ori):
     WIDTH = 1500
@@ -98,7 +106,7 @@ def getLyrics(img_ori):
         matched_result.append(np.take(possible_contours, idx_list))
 
     PLATE_WIDTH_PADDING = 1.2
-    PLATE_HEIGHT_PADDING = 1.7;
+    PLATE_HEIGHT_PADDING = 1.7
 
     MIN_PLATE_RARIO = 0
     MAX_PLATE_RATIO = 100
@@ -204,14 +212,24 @@ def getLyrics(img_ori):
         lyrics_senc.append(img_result)
 
         # OCR 문자 인식
-        chars = pytesseract.image_to_string(
-            img_result,
-            lang='kor',
-            config= '--oem 2'
-        )
+        # chars = pytesseract.image_to_string(
+        #     img_result,
+        #     lang='kor',
+        #     config= '--oem 2'
+        # )
+        
+        # google vision api
+        pillow = Image.fromarray(img_result)
+        data = BytesIO()
+        pillow.save(data, "png")
+        content = data.getvalue()
+        image = vision.Image(content=content)
+        response = client.text_detection(image=image)
+        chars = response.text_annotations
+
         result_chars = ''
-        for c in chars:
-            if c.isalpha() or c.isdigit() or (ord('가') <= ord(c) <= ord('힣')):
+        for c in chars[0].description:
+            if c.isalpha() or c.isdigit() or (ord('가') <= ord(c) <= ord('힣')) or c in (' '):
                 result_chars += c
 
         plate_chars.append(result_chars)

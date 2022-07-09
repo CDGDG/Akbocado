@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "akbocado",
+  "private_key_id": "5c075ac55e9176441dd2787024058cbffb147e01",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCyJSOzYUcqCIQ3\nQ+FabxGjbMI+BRLNQNmqNpm67Wd5RVqWha2RrdUIkJNyN0fRR/5I0ffp4gwW/Fl/\ni9Nx6Gh5NNbyr5AUNPxuTOhPwH5tg0qUcN3yJOmxZmbHEKcVlZ9PBpco5K8upvc8\nkGr8HDDJgtAHDg3fb1l4ZFA/gJGFINPiKNJHwa+djTxFOzR7yG0YhvygmBlOL1BW\nT8vjlVteRDvTiQubH//bItgaZKTNjC+TB+D4d7gcweyWeN2zPhXzIM6NtIVUnCVX\nEEKretnE0JmDn3fQKC4GSzRPCTe1COYdbkE6DjtjdcAws3iaYjSNl1dcedZjv1Zd\n32T/HPcPAgMBAAECggEABtbr3M5j0TvReQkMpRBgRid9+laZ3F0x3i9JeLFLszlp\nRcqCbvY/GHHrOfaLCysZ8Al2XLmWiugLtvITNKuJHfoxidDEFdqGRI/ZrXzaUxxi\n0nnWM56c2vhFAuiN7wNhwe14A+m/xhPtUxsdAxVBVENG9wu1lvoAnowvaTi88uD5\ne/DZD5Fs2wMYOukwKeB8o6QhwKOierPpx5cl9XvS9D0tjxw33aV2HEHmFpg1+4yK\namTMrChbMl6DuMN1/gyBMWjFZW+EZMxAggkHySI6W6XSscwh0ezrczhcMo8eNAEt\nJ8z2cpiW4ov7jTlZWh+BJoeNxmkHK6n/ejRoaiEFnQKBgQDo1ocHla6FvDzQp6e/\nbkW2NKWfjw4fnxfe4Fwf0WbC8zp4KQB8EGUmD0STRyOgBlnEEztvZiVaLejHCEBn\nPGZmHqwjxlyVMU2uylK97nh4Q+POWCNijhIgIwqya1XDY8EvtQY9K1f0Or4qG43I\ncHEfAGX2hewofRhTiwtyqjVcVQKBgQDD3cwdxsw5Jdetw6ceqsndSOZKujRy9ceC\nd+AU78xep/fcfuz7ibaNLeVSW4p8THFZ2ofYhZ42p5LIZjv7ESsoluwh0BXOXIWG\neiJyqZM+1tPmW03c/SpY9YizpkjV/o8i2arIxRBfXBxAATdDy17AUneISKSuhpuR\nT0UoDDdp0wKBgQDXDYXMIJkAFpuJEMDkE8K5hqjO1b9yv2u5xDnyfWNPfn2rjBtR\ne4cg/wsUiKlD3Xm9mxHTU2H+h9avNlTdxTDC82OE62qJte8NGPwRRxfn5LSc2lVc\nauIc4qC3qGGfRRyipq1rhAQJpNQNakOrNQeWXbTPXGSCBQCZ8RwSvVjpvQKBgQCz\nyyK2ZqlLADjWchYzaXU54tQ63miM6p5EXkPdFC6W6Tr2NbDWSZjASdQK4Krj5Mvc\nPmSa1jTgWLy9plMC6cSjUr7ZXwjVUErlobGDbbQTZ+JFv6Re6in4VRMyTb7oaO79\nf69s8rBPyN7JxhPz8Hg+tLSy7nP1HO0q2whRdb1cLwKBgFnuUaGRtKP65IJzS35h\nXnFk1KSGGxrEiqb+1GaS92z7NAt34zLpMdS4eXQ6hkVS6bug0vc7eXU5SGn+exNZ\nw3QBn4YD7hNkEFIVEfUQ3ZO+UcNs38TPZiSOPcbEaejw3H345cD+5TlG+hQyBMld\ncDsVmaz5v+OoCtWzbIjpaXDq\n-----END PRIVATE KEY-----\n",
+  "client_email": "django@akbocado.iam.gserviceaccount.com",
+  "client_id": "111879456727856679142",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/django%40akbocado.iam.gserviceaccount.com"
+}

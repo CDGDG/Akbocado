@@ -248,24 +248,30 @@
             success:function(response){
                 if(response.type == 'title'){
                     $('#result').html('')
+                    $('#titleinfo').html('')
                     console.log(response.title)
                     $('#resultmodal > h2').text('제목 분석 결과')
                     $('#result').append($(`<a href="javascript:search('title', '${response.title}', '')" style='margin:0;min-height:3%;'>${response.title}</a>`))
                     $('#titleinfo').text(response.title)
                 }else if(response.type == 'artist'){
                     $('#result').html('')
+                    $('#artistinfo').html('')
                     console.log(response.artist)
                     $('#resultmodal > h2').text('가수 분석 결과')
                     $('#result').append($(`<a href="javascript:search('artist', '${response.artist}', '')" style='margin:0;min-height:3%;'>${response.artist}</a>`))
                     $('#artistinfo').text(response.artist)
                 }else{
                     $('#result').html('')
+                    $('#lyricsinfo').html('')
                     lyricstext = ''
                     $('#resultmodal > h2').text('가사 분석 결과')
                     for(i=0; i<response.lyrics.length; i++){
                         console.log(response.lyrics[i])
                         $('#result').append($(`<p style='margin:0;min-height:3%;'>${response.lyrics[i]}</p>`))
                         $('#lyricsinfo').append($(`<p style='margin:0;min-height:3%;'>${response.lyrics[i]}</p>`))
+                    }
+                    for(let url of response.lyrics_uri){
+                        $('#result').append($(`<img src=${url} style='padding: 0 10%;'>`))
                     }
                 }
                 $('.modal').hide()
