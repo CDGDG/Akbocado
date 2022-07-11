@@ -59,7 +59,9 @@
                 <section class="col-8 col-12-narrower">
                     <div class="row">
                         <div class="col-6 col-12-narrower">
-                            <img src="{{image.img.url}}" alt="악보" id='akbo_temp'>
+                            <a href="javascript:analyze_type('note')">
+                                <img src="{{image.img.url}}" alt="악보" id='akbo_temp'>
+                            </a>
                         </div>
                         <div class="col-6 col-12-narrower">
                             <input type="hidden" id='img_id' value="{{original.pk}}">
@@ -84,10 +86,7 @@
                                 </li>
                                 <li class='col-12'>
                                     <div class="row">
-                                        <div class="col-6 col-12-narrowers">
-                                            <button class="button large" id='play'>악보 재생</button>
-                                        </div>
-                                        <div class="col-6 col-12-narrowers">
+                                        <div class="col-12 col-12-narrowers">
                                             <button class="button large" id='save'>악보 저장</button>
                                         </div>
                                     </div>
@@ -170,6 +169,13 @@
         text-decoration: none;
         color: white;
         display: block;
+    }
+    .notespan{
+        width: 25%;
+        border-radius: 15px;
+    }
+    .pt{
+        color: black;
     }
 </style>
 <script>
@@ -260,7 +266,7 @@
                     $('#resultmodal > h2').text('가수 분석 결과')
                     $('#result').append($(`<a href="javascript:search('artist', '${response.artist}', '')" style='margin:0;min-height:3%;'>${response.artist}</a>`))
                     $('#artistinfo').text(response.artist)
-                }else{
+                }else if(response.type == 'lyrics'){
                     $('#result').html('')
                     $('#lyricsinfo').html('')
                     lyricstext = ''
@@ -273,6 +279,26 @@
                     for(let url of response.lyrics_uri){
                         $('#result').append($(`<img src=${url} style='padding: 0 10%;'>`))
                     }
+                }else if(response.type == 'note'){
+                    console.log(response)
+                    pitchname = ['도', '레', '미', '파', '솔', '라', '시']
+                    beats = response.beats
+                    pitches = response.pitches
+                    $('#result').html('')
+                    $('#resultmodal > h2').text('음표 분석 결과')
+                    $('#result').append($('<button class="button large" id="play" style="width: 94%;margin: 3%;">재생하기</button>').click(playmusic))
+
+                    $('#result').append('<div id="notes" style="display:flex;flex-wrap: wrap;margin:3%;background-color:white;border-radius:20px;"></div>')
+                    for(let i=0; i<beats.length;i++){
+                        pit = pitchname[(pitches[i]-4) % 7]
+                        $('#notes').append(
+                            $('<span class="notespan"></span>').append(
+                                $(`<img src="/static/noteimages/note${beats[i]}.png" data=${beats[i]}>`)
+                            ).append(
+                                $(`<span class='pt' data=${pitches[i] - 4}></span>`).text(pit)
+                            )
+                        )
+                    }
                 }
                 $('.modal').hide()
                 $('#resultmodal').show()
@@ -281,8 +307,30 @@
         })
     }
 
+    const sleep = async (ms) => {
+        return new Promise(
+          (resolve, reject) =>
+            setTimeout(
+              () => resolve(),
+              ms * 1000
+            )
+        );
+    };
 
+    const playmusic = async () => {
+        $notespan = $('.notespan')
+        for(let ns of $notespan){
+            $ns = $(ns)
+            let beat = $ns.children('img').attr('data')
+            let pitch = $ns.children('span.pt').attr('data')
 
+            $ns.css({'background-color': '#4D8E58'})
+
+            await sleep(2/beat)
+
+            $ns.css({'background-color': 'transparent'})
+        }
+    }
 
 
 </script>

@@ -51,7 +51,7 @@ def analyze_type(request,type):
             'artist': artist,
             # 'artist_uri' : artist_uri,
         }
-    else:
+    elif type == 'lyrics':
         lyrics = None
         lyrics, lyrics_imgs = getLyrics(akbo_image)
         lyrics_uri = [to_data_uri(l) for l in lyrics_imgs]
@@ -61,6 +61,22 @@ def analyze_type(request,type):
             'lyrics': lyrics,
             'lyrics_uri' : lyrics_uri,
         }
+    elif type == 'note':
+        # 음표 분석
+        image_1 = modules.remove_noise(akbo_image) # 1. 보표 영역 추출 및 그 외 노이즈 제거
+        image_2, staves = modules.remove_staves(image_1) # 2. 오선 제거
+        image_3, staves = modules.normalization(image_2, staves, 10) # 3. 악보 이미지 정규화
+        image_4, objects = modules.object_detection(image_3, staves) # 4. 객체 검출 과정
+        image_5, objects = modules.object_analysis(image_4, objects) # 5. 객체 분석 과정
+        image_6, key, beats, pitches = modules.recognition(image_5, staves, objects) # 6. 인식 과정
+        context = {
+            'type': type,
+            'key': key,
+            'beats': beats,
+            'pitches': pitches,
+            # 'images': [image_1, image_2, image_3, image_4, image_5, image_6],
+        }
+        
 
     return JsonResponse(context)
 
@@ -101,8 +117,12 @@ def analyze(request):
     context = {
         'image': image,
         'original': original,
-        'title': title,
-        'artist': artist
+        # 'title': title,
+        # 'artist': artist
+        # 'note_images': [image_1, image_2, image_3, image_4, image_5, image_6],
+        # 'key': key,
+        # 'beats': beats,
+        # 'pitches': pitches,
     }
     print("=================",original.pk)
 

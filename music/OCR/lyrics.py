@@ -229,7 +229,7 @@ def getLyrics(img_ori):
 
         result_chars = ''
         for c in chars[0].description:
-            if c.isalpha() or c.isdigit() or (ord('가') <= ord(c) <= ord('힣')) or c in (' '):
+            if c.isdigit() or (ord('가') <= ord(c) <= ord('힣')) or c in (' '):
                 result_chars += c
 
         plate_chars.append(result_chars)
