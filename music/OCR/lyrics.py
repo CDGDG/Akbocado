@@ -55,7 +55,7 @@ def getLyrics(img_ori):
 
             oline_contours.append(d)
 
-    LYRIC_MIN_AREA, LYRIC_MAX_AREA = 20, 400
+    LYRIC_MIN_AREA, LYRIC_MAX_AREA = 50, 400
     LYRIC_MIN_RATIO = 0.1
 
     possible_contours = []
@@ -86,8 +86,8 @@ def getLyrics(img_ori):
                     possible_contours.append(d)
 
     LYRIC_MAX_DIAG_MULTIPLYER = 300
-    LYRIC_MAX_ANGLE_DIFF = 5.0
-    LYRIC_MAX_AREA_DIFF = 10.0
+    LYRIC_MAX_ANGLE_DIFF = 7.0
+    LYRIC_MAX_AREA_DIFF = 100.0
     LYRIC_MIN_N_MATCHED = 10
 
     result_idx = find_chars(
@@ -121,7 +121,7 @@ def getLyrics(img_ori):
 
         # 번호판의 center 좌표를 계산해봅니다. (처음 contour ~ 마지막 countour 의 center 거리)
         plate_cx = WIDTH // 2
-        plate_cy = (sorted_chars[0]['cy'] + sorted_chars[-1]['cy']) / 2
+        plate_cy = (sorted_chars_y[0]['cy'] + sorted_chars_y[-1]['cy']) / 2
 
         # 번호판의 width 계산
         plate_width = int((WIDTH / 20) * 19)
@@ -156,14 +156,14 @@ def getLyrics(img_ori):
     lyrics_senc = []
     for i, plate_img in enumerate(plate_imgs):
         # x1.6배 확대
-        plate_img = cv2.resize(plate_img, dsize=(0, 0), fx=3.0, fy=3.0)
+        plate_img = cv2.resize(plate_img, dsize=(0, 0), fx=5.0, fy=5.0)
 
         # threshhold 이진화
         _, plate_img = cv2.threshold(
             plate_img,
-            thresh=120,
+            thresh=0.0,
             maxval=255.0,
-            type=cv2.THRESH_BINARY,
+            type=cv2.THRESH_BINARY|cv2.THRESH_OTSU,
         )
 
         # 또 한번 contour 찾기
@@ -182,7 +182,7 @@ def getLyrics(img_ori):
             area = w * h # 면적과
             ratio = w / h # 가로세로 비율 구하고
             if 0.3 < ratio < 1.4 \
-            and area < 25000:
+            and area < 60000:
                 if x < plate_min_x: plate_min_x = x
                 if y < plate_min_y: plate_min_y = y
                 if x + w > plate_max_x: plate_max_x = x + w
@@ -192,7 +192,7 @@ def getLyrics(img_ori):
         if not img_result.any():
             plate_chars.append('')
             continue
-        img_result = cv2.GaussianBlur(img_result, ksize=(3, 3), sigmaX=0)
+        img_result = cv2.GaussianBlur(img_result, ksize=(9, 9), sigmaX=0)
         _, img_result = cv2.threshold(
             img_result,
             thresh=0.0,
