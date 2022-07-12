@@ -8,6 +8,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('user/', include('user.urls')),
     path('music/', include('music.urls')),
+    path('melon/', include('melon.urls')),
     path('index/', index),
 ]
 

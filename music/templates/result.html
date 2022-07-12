@@ -2,6 +2,12 @@
 
 {% block modal %}
 <div id='mo' style='position: absolute; background-color: rgba(0,0,0,0.5); width: 100%; height:100%; z-index: 20000;display: none;'>
+    <div id="loadingmodal" class="modal" style='z-index:20002;height:400px;width:400px;'>
+        <div class="loading-container">
+            <div class="loading"></div>
+            <div id="loading-text">분석 중</div>
+        </div>        
+    </div>
     <div id="resultmodal" class="modal result_modal" style='z-index: 20001'>
         <span class='close'>&times;</span>
         <img src="" alt="">
@@ -102,9 +108,25 @@
 {% endblock  %}
 {% block script %}
 <style>
+    .modal::-webkit-scrollbar {
+        width: 10px;  /* 스크롤바의 너비 */
+    }
+    
+    .modal::-webkit-scrollbar-thumb {
+        height: 20%; /* 스크롤바의 길이 */
+        background: #4D8E58; /* 스크롤바의 색상 */
+        
+        border-radius: 20px;
+    }
+
+    .modal::-webkit-scrollbar-track {
+        background: rgba(33, 122, 244, .0);  /*스크롤바 뒷 배경 색상*/
+        margin: 20px 0;
+    }
+
     .modal{
         width: 600px;
-        height:800px;
+        height:600px;
         top: 30%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -156,8 +178,8 @@
         border: 2px solid white;
         border-radius: 1em;
         background-color: white;
-        height: 50vh;
         padding: 3%;
+        width: 100%;
     }
     ul#info{
         border: 2px solid white;
@@ -177,7 +199,10 @@
     .pt{
         color: black;
     }
+
+    
 </style>
+<link rel="stylesheet" href="/static/assets/css/loader.css" />
 <script>
     $('.close').click(function(){
         $('#mo').toggle()
@@ -246,6 +271,9 @@
     function analyze_type(type){
         var img_id = $('#img_id').val()
         console.log(img_id)
+        $('.modal').hide()
+        $('#loadingmodal').show()
+        $('#mo').show()
         $.ajax({
             url:'{% url "Music:analyze_type" type=12345 %}'.replace(/12345/, type),
             type:'GET',
@@ -302,7 +330,7 @@
                 }
                 $('.modal').hide()
                 $('#resultmodal').show()
-                $('#mo').toggle()
+                $('#mo').show()
             }
         })
     }
@@ -317,19 +345,55 @@
         );
     };
 
+    var audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+    var osc, gn;
+
+    function sound(freq, ms){
+        if (osc && gn) {
+            gn.disconnect(audioCtx.destination)
+            osc.disconnect(gn)
+        }
+
+        osc = audioCtx.createOscillator() // 오실레이터 생성
+        osc.type = "sine" // 그래프 타입 설정 (sine(기본값), saw, triangle 등)
+        osc.frequency.value = freq // 주파수(Hz) 입력
+        gn = audioCtx.createGain() // 게인노드 생성
+        gn.gain.value = 0.3;
+        osc.connect(gn) // 오실레이터와 게인노드 연결
+        gn.connect(audioCtx.destination) // 게인노드를 추상화된 출력장치(스피커 등)에 연결
+
+        osc.start() // 오실레이터 스타트(음 재생)
+        // 1초간 재생 후 페이드아웃하면서 정지 (마지막의 튀는 음을 방지하기 위함)
+        setTimeout(function() {
+        gn.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.04)
+        }, ms)
+    }
+
     const playmusic = async () => {
         $notespan = $('.notespan')
+        freqlist = [349, 392, 440, 494, 524, 587, 659, 698, 784, 880, 988, 1047, 1175, 7319, 1397]
+
+        cnt = 0
         for(let ns of $notespan){
             $ns = $(ns)
+
+            cnt += 1
+            if(cnt%4==0){
+                $ns.offset
+                $("#resultmodal").animate({scrollTop: $('#resultmodal').scrollTop()+120},500);
+            }
+
             let beat = $ns.children('img').attr('data')
             let pitch = $ns.children('span.pt').attr('data')
 
             $ns.css({'background-color': '#4D8E58'})
 
+            sound(freqlist[parseInt(pitch)+4], (2/beat)*1000)
             await sleep(2/beat)
 
             $ns.css({'background-color': 'transparent'})
         }
+        $("#resultmodal").animate({scrollTop: 0},500);
     }
 
 

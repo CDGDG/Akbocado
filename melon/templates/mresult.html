@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/c0bcdc1f96.js" crossorigin="anonymous"></script>
+<div id="banner-wrapper">
+    <section id="banner" class="container">
+        <div class="row">
+            <div id="content" class="col-12">
+                <header class="major" style='border: 2px solid white; padding: 5%; margin-bottom:5%;border-radius:15px;'>
+                    <h2>분석 결과</h2>
+                    <img src="{{image.img.url}}" alt="" style='width: 50%;border-radius: 15px;'>
+                    <h3>{{title}} - {{artist}}</h3>
+                    <a href="melonapp://play?menuid=10010101&amp;ctype=1&amp;cid={{info.id}}" class='button fit' style='margin-top: 30px;width: 80%;'>멜론 플레이어에서 재생하기</a>
+                </header>
+                <section class="col-8 col-12-narrower">
+                    <h2>검색 결과</h2>
+                    <img src="{{info.image}}" alt="앨범 커버">
+                    <div class="box">
+                        <h3>아티스트</h3>
+                        <p class='artists'><h4>{{info.artist}}</h4></p>
+                        <h3>앨범</h3>
+                        <p><h4>{{info.album}}</h4></p>
+                        <h3>발매</h3>
+                        <p>{{info.release}}</p>
+                        <h3>가사</h3>
+                        <div style='text-align:center;'>
+                        {% for lyric in info.lyrics %}
+                        <p style='margin:0;min-height:3%;'>{{lyric}}</p>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    console.log('{{info.id}}')
+</script>
+{% endblock  %}

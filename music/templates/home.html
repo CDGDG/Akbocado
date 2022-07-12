@@ -157,11 +157,14 @@
             data: formdata,
             success:function(response){
                 console.log(response.data)
+                response.data = '멜론'
                 if(response.data == '악보'){
                     $('#akboform').submit();
-                }else{
+                }else if(response.data == '일반'){
                     alert('악보가 아닙니다.\n악보를 선택해주세요.');
                     location.reload();
+                }else if(response.data == '멜론'){
+                    $('#akboform').attr('action', "{% url 'Melon:analyze' %}").submit();
                 }
             }
         })

@@ -68,7 +68,13 @@ def analyze_type(request,type):
         image_3, staves = modules.normalization(image_2, staves, 10) # 3. 악보 이미지 정규화
         image_4, objects = modules.object_detection(image_3, staves) # 4. 객체 검출 과정
         image_5, objects = modules.object_analysis(image_4, objects) # 5. 객체 분석 과정
-        image_6, key, beats, pitches = modules.recognition(image_5, staves, objects) # 6. 인식 과정
+        image_6, key, beats_temp, pitches = modules.recognition(image_5, staves, objects) # 6. 인식 과정
+        beats = [beat if beat >= 0 else -beat for beat in beats_temp]
+        errors = [i for i, pit in enumerate(pitches) if pit < 0]
+        for e in reversed(errors):
+            del(beats[e])
+            del(pitches[e])
+
         context = {
             'type': type,
             'key': key,
@@ -111,9 +117,9 @@ def analyze(request):
     # image_5, objects = modules.object_analysis(image_4, objects) # 5. 객체 분석 과정
     # image_6, key, beats, pitches = modules.recognition(image_5, staves, objects) # 6. 인식 과정
   
-    title = title or '인스타그램'
-    artist = artist or '딘'
-    lyrics = lyrics or '알 수 없음'
+    # title = title or '인스타그램'
+    # artist = artist or '딘'
+    # lyrics = lyrics or '알 수 없음'
     context = {
         'image': image,
         'original': original,
@@ -199,10 +205,12 @@ def checkAkboImage(request):
     img = akboImage.read()
     image = cv2.imdecode(np.frombuffer(img , np.uint8), cv2.IMREAD_UNCHANGED)
     # print("==========",img,"=============")
-    print(predict(image)) 
-    if predict(image) == 1:
+    result = predict(image)
+    if result == 1:
         print("=========악보 아님==============")
         akbo = "일반"
+    elif result == 2:
+        akbo = '멜론'
     return JsonResponse({'data': akbo})
 
 
