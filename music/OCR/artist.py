@@ -8,7 +8,7 @@ import os
 
 from music.OCR.OCR import find_chars, rgb
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "C:\DevRoot\Git_Project\Akbocado\keys\akbocado-5c075ac55e91.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/keys/akbocado-5c075ac55e91.json"
 from google.cloud import vision
 
 from io import BytesIO

@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from matplotlib import artist
 import requests
+from music.OCR.artist import getArtist
 from music.models import Input
 from . import functions as fs
 from . import modules
@@ -45,11 +46,13 @@ def analyze_type(request,type):
         artist = None
         # artist, artist_imgs =
         # artist_uri = [to_data_uri(l) for l in artist_imgs]
-        artist = artist or '딘'
+        artist, artist_imgs = getArtist(akbo_image)
+        artist_uri = [to_data_uri(a) for a in artist_imgs]
+        artist = artist or '알 수 없음'
         context = {
             'type' : type,
             'artist': artist,
-            # 'artist_uri' : artist_uri,
+            'artist_uri' : artist_uri,
         }
     elif type == 'lyrics':
         lyrics = None
