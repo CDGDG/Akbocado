@@ -3,7 +3,66 @@ import pytesseract
 import numpy as np
 import os
 
+from PIL import Image
+from io import BytesIO
+
 from music.OCR.OCR import find_chars
+
+import requests
+import uuid
+import time
+import json
+import base64
+
+def clovaOCR(content):
+
+    api_url = 'https://dw6wmnd9rb.apigw.ntruss.com/custom/v1/17095/d2b7e0086df3f8add4c2a156094da07fcd1ccc8c1b34d4a6400862a1543775cf/general'
+    secret_key = 'SnlPd1JSeFJJWnl4WVBzYkFSVWRPTmFNckVld2htTE0='
+
+    # image_file = r'C:\DevRoot\Dropbox\AKBOCADO\dataset\cut.png'
+    # output_file = 'output/output1.json'
+
+    # with open(image_file, 'rb') as img:
+    #     a = img.read()
+    #     base64_string1 = base64.b64encode(img.read())
+
+    request_json = {
+        'images': [
+            {
+                "format": "png",
+                "name": "demo",
+                "data": base64.b64encode(content).decode(),
+    #             "url": "http://www.akbobada.com/home/akbobada/archive/akbo/vod/sampleimg/2021061198szn8.png"
+            }
+        ],
+        "lang": "ko",
+        'requestId': str(uuid.uuid4()),
+        "resultType": "string",
+        'version': 'V2',
+        'timestamp': int(round(time.time() * 1000))
+    }
+    # print(request_json)
+
+    payload = {'message': json.dumps(request_json).encode('UTF-8')}
+    # print(payload)
+    # files = [
+    #   ('file', open(image_file,'rb'))
+    # ]
+    headers = {
+        'X-OCR-SECRET': secret_key,
+    #     'Content-Type' : 'application/json'
+    }
+
+    response = requests.request("POST", api_url, headers=headers, data = payload['message'])
+
+    res = json.loads(response.text.encode('utf8'))
+    for title in res['images'][0]['fields']:
+        print(title['inferText'], end=' ')
+
+    return ' '.join([
+        title['inferText']
+        for title in res['images'][0]['fields']
+    ])
 
 def getTitle(img_ori):
 
@@ -184,113 +243,92 @@ def getTitle(img_ori):
             'w': int(plate_width),
             'h': int(plate_height),
         })
-        
 
-    # 번호판 문자열 인식후 이를 담기 위한 변수들
-    longest_idx, longest_text = -1, 0
-    plate_chars = []   # <- 여기에 번호판(들)의 문자를 담을거다
+        # 번호판 문자열 인식후 이를 담기 위한 변수들
+        longest_idx, longest_text = -1, 0
+        plate_chars = []   # <- 여기에 번호판(들)의 문자를 담을거다
 
-    cnt = 1
-    SIZE = 15
-    for i, plate_img in enumerate(plate_imgs):
-        # x1.6배 확대
-        plate_img = cv2.resize(plate_img, dsize=(0, 0), fx=SIZE, fy=SIZE)
-        
-        # threshold 이진화
-        _, plate_img = cv2.threshold(
-            plate_img,
-            thresh=0.0,
-            maxval=255.0,
-            type=cv2.THRESH_BINARY | cv2.THRESH_OTSU,
-        )
-        
-        # 또 한번 contour 찾기
-        contours, _ = cv2.findContours(
-            plate_img, 
-            mode=cv2.RETR_LIST,
-            method=cv2.CHAIN_APPROX_SIMPLE,
-        )
-        
-        # 여기서 번호판이 맞는지 확인해보고 글자도 추출할거다
-        # ↓ (앞서 했던것과 거의 동일)
-        
-        # 잠시후, 이미지 안에서 추출할 '번호판 부분' 의 좌표값을 일단 초기화
-        plate_min_x, plate_min_y = plate_img.shape[1], plate_img.shape[0]
-        plate_max_x, plate_max_y = 0, 0
-        
-        temp_result = plate_img.copy()
-        
-        for contour in contours:  # 각 contour  별로
-            x, y, w, h = cv2.boundingRect(contour)  # boundingRect 구하고
-        
-            area = w * h  # 면적과
-            ratio = w / h # 가로세로비율 구하고
+        cnt = 1
+        SIZE = 15
+        for i, plate_img in enumerate(plate_imgs):
+            # x1.6배 확대
+            plate_img = cv2.resize(plate_img, dsize=(0, 0), fx=SIZE, fy=SIZE)
             
-            # 앞서 정해둔 설정기준에 맞는지 체크해서
-    #         if area > MIN_AREA \
-    #         and w > MIN_WIDTH and h > MIN_HEIGHT \
-    #         and MIN_RATIO < ratio < MAX_RATIO:
-            # '번호판 부분' 좌표의 최대, 최소값 구하기
-            if x < plate_min_x: plate_min_x = x
-            if y < plate_min_y: plate_min_y = y
-            if x + w > plate_max_x: plate_max_x = x + w
-            if y + h > plate_max_y: plate_max_y = y + h
+            # threshold 이진화
+            _, plate_img = cv2.threshold(
+                plate_img,
+                thresh=0.0,
+                maxval=255.0,
+                type=cv2.THRESH_BINARY | cv2.THRESH_OTSU,
+            )
+            
+            # 또 한번 contour 찾기
+            contours, _ = cv2.findContours(
+                plate_img, 
+                mode=cv2.RETR_LIST,
+                method=cv2.CHAIN_APPROX_SIMPLE,
+            )
+            
+            # 여기서 번호판이 맞는지 확인해보고 글자도 추출할거다
+            # ↓ (앞서 했던것과 거의 동일)
+            
+            # 잠시후, 이미지 안에서 추출할 '번호판 부분' 의 좌표값을 일단 초기화
+            plate_min_x, plate_min_y = plate_img.shape[1], plate_img.shape[0]
+            plate_max_x, plate_max_y = 0, 0
+            
+            temp_result = plate_img.copy()
+            
+            for contour in contours:  # 각 contour  별로
+                x, y, w, h = cv2.boundingRect(contour)  # boundingRect 구하고
+            
+                area = w * h  # 면적과
+                ratio = w / h # 가로세로비율 구하고
                 
-            cv2.rectangle(temp_result, pt1=(x, y), pt2=(x+w, y+h), color=(255, 255,255), thickness=2)
+                # 앞서 정해둔 설정기준에 맞는지 체크해서
+        #         if area > MIN_AREA \
+        #         and w > MIN_WIDTH and h > MIN_HEIGHT \
+        #         and MIN_RATIO < ratio < MAX_RATIO:
+                # '번호판 부분' 좌표의 최대, 최소값 구하기
+                if x < plate_min_x: plate_min_x = x
+                if y < plate_min_y: plate_min_y = y
+                if x + w > plate_max_x: plate_max_x = x + w
+                if y + h > plate_max_y: plate_max_y = y + h
                     
-        # 위 에서 결정된 '번호판 부분' 좌표를 사용하여 '번호판 부분' 만 잘라내기 (crop)
-        img_result = plate_img[plate_min_y:plate_max_y, plate_min_x:plate_max_x]
-        
-        cnt += 1
-        
-        # ↓ OCR 글자 인식하기 위해(검출률 향상을 위해) 약간의 처리를 추가합니다
-        
-        # 1. 노이즈 제거 (blur + threshold) 하겠습니다
-        img_result = cv2.GaussianBlur(img_result, ksize=(21, 21), sigmaX=0)
-        _, img_result = cv2.threshold(
-            img_result,
-            thresh=0.0, 
-            maxval=255.0,
-            type=cv2.THRESH_BINARY | cv2.THRESH_OTSU,
-        )
-        
-        # 2. 이미지에 패딩을 넣어준다
-        # 검정색 패딩(여백) 을 주어 tesseract 가 좀더 인식을 수월하게 할수 있도록 한다
-        border = 40 * int(SIZE)
-        img_result = cv2.copyMakeBorder(
-            img_result,
-            top=border, bottom=border, left=border, right=border,  # 상하좌우 두께 10
-            borderType=cv2.BORDER_CONSTANT, 
-            value=(0,0,0),  # 검정색
-        )
-        
-        # 드디어! OCR 문자 인식!
-        chars = pytesseract.image_to_string(
-            img_result,
-            lang='kor',
-            config='--psm 6 --oem 2'
-        )
-        
-        # ■ 이렇게 tesseract 로 읽어낸 문자열 안에 이상한 글자들도 있다. 이들을 걸러내주어야 한다
-        # 어짜피 '자동차 번호판' 은 글자 + 숫자로 이루어져 있다.
-        # - 반드시 숫자는 있어야 한다.
-        result_chars = ''
-        for c in chars:
-            result_chars += c
-                
-        print(chars)
-        plate_chars.append(result_chars)
-        print(result_chars)
-        
-        # 가장 문자열이 긴 번호판을 우리가 찾는 번호판이라 하자.
-    #     print(i)
-        if len(result_chars) > longest_text:
-            longest_idx = i
+                cv2.rectangle(temp_result, pt1=(x, y), pt2=(x+w, y+h), color=(255, 255,255), thickness=2)
+                        
+            # 위 에서 결정된 '번호판 부분' 좌표를 사용하여 '번호판 부분' 만 잘라내기 (crop)
+            img_result = plate_img[plate_min_y:plate_max_y, plate_min_x:plate_max_x]
             
-        # 시각화
-        cnt+=1
+            cnt += 1
+            
+            # ↓ OCR 글자 인식하기 위해(검출률 향상을 위해) 약간의 처리를 추가합니다
+            
+            # 1. 노이즈 제거 (blur + threshold) 하겠습니다
+            img_result = cv2.GaussianBlur(img_result, ksize=(21, 21), sigmaX=0)
+            _, img_result = cv2.threshold(
+                img_result,
+                thresh=0.0, 
+                maxval=255.0,
+                type=cv2.THRESH_BINARY | cv2.THRESH_OTSU,
+            )
+            
+            # 2. 이미지에 패딩을 넣어준다
+            # 검정색 패딩(여백) 을 주어 tesseract 가 좀더 인식을 수월하게 할수 있도록 한다
+            border = 40 * int(SIZE)
+            img_result = cv2.copyMakeBorder(
+                img_result,
+                top=border, bottom=border, left=border, right=border,  # 상하좌우 두께 10
+                borderType=cv2.BORDER_CONSTANT, 
+                value=(0,0,0),  # 검정색
+            )
+        
 
-    return result_chars
+    pillow = Image.fromarray(img_result)
+    data = BytesIO()
+    pillow.save(data, "png")
+    content = data.getvalue()
+
+    return clovaOCR(content), img_result
 
 
 

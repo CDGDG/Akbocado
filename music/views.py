@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from matplotlib import artist
 import requests
+from music.OCR.title import getTitle
 from music.models import Input
 from . import functions as fs
 from . import modules
@@ -33,13 +34,13 @@ def analyze_type(request,type):
     akbo_image = cv2.imdecode(np.frombuffer(image.read(), np.uint8), cv2.IMREAD_UNCHANGED)
     if type == 'title':
         title= None
-        # title,title_imgs =
-        # lyrics_uri = [to_data_uri(l) for l in title_imgs]
+        title,title_imgs = getTitle(akbo_image)
+        title_uri = [to_data_uri(l) for l in title_imgs]
         title = title or '인스타그램'
         context = {
             'type':type,
             'title':title,
-            # 'title_uri': title_uri
+            'title_uri': title_uri
             }
     elif type == 'artist':
         artist = None
