@@ -20,7 +20,7 @@
         <h2 id='artistname'></h2>
         <hr>
         <div class="table-wrapper">
-            <h4>인기곡</h4>
+            <h4>최신곡</h4>
             <table class="alt" style='color: white;'>
                 <thead>
                     <tr>
@@ -38,7 +38,7 @@
         <h2 id="trackname"></h2>
         <hr>
         <div class="table-wrapper">
-            <h4>인기곡</h4>
+            <h4>최신곡</h4>
             <table class="alt" style='color: white;'>
                 <thead>
                     <tr>
@@ -287,6 +287,7 @@
                     $('#resultmodal > h2').text('제목 분석 결과')
                     $('#result').append($(`<a href="javascript:search('title', '${response.title}', '')" style='margin:0;min-height:3%;'>${response.title}</a>`))
                     $('#titleinfo').text(response.title)
+                    $('#result').append($(`<img src=${response.title_uri} style='padding: 0 10%;'>`))
 
                 }else if(response.type == 'artist'){
                     $('#result').html('')
@@ -294,12 +295,16 @@
                     console.log(response.artist)
                     $('#resultmodal > h2').text('가수 분석 결과')
                     for(let artist of response.artist){
-                        $('#result').append($(`<a href="javascript:search('artist', '${artist}', '')" style='margin:0;min-height:3%;'>${artist}</a><br>`))
+                        $('#result').append($(`<a href="javascript:search('artist', '${artist[1]}', '')" style='margin:0;min-height:3%;'>${artist[0]} : ${artist[1]}</a><br>`))
                     }
                     for(let url of response.artist_uri){
                         $('#result').append($(`<img src=${url} style='padding: 0 10%;'>`))
                     }
-                    $('#artistinfo').text(response.artist)
+                    artisttext = ''
+                    for(let artist of response.artist){
+                        artisttext += ` ${artist[0]} : ${artist[1]} `
+                    }
+                    $('#artistinfo').text(artisttext)
 
                 }else if(response.type == 'lyrics'){
                     $('#result').html('')

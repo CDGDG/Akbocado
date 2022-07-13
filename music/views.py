@@ -1,13 +1,10 @@
-from anyio import open_file
 from bs4 import BeautifulSoup
 from django.http import JsonResponse
 from django.shortcuts import render
-from matplotlib import artist
 import requests
 from music.OCR.title import getTitle
 from music.OCR.artist import getArtist
 from music.models import Input
-from . import functions as fs
 from . import modules
 
 from tensorflow.keras.models import load_model
@@ -36,20 +33,21 @@ def analyze_type(request,type):
     if type == 'title':
         title= None
         title,title_imgs = getTitle(akbo_image)
-        title_uri = [to_data_uri(l) for l in title_imgs]
-        title = title or '인스타그램'
+        title_uri = to_data_uri(title_imgs)
+        title = title or '알 수 없음'
         context = {
             'type':type,
             'title':title,
-            'title_uri': title_uri
+            'title_uri': title_uri,
             }
     elif type == 'artist':
         artist = None
         # artist, artist_imgs =
         # artist_uri = [to_data_uri(l) for l in artist_imgs]
         artist, artist_imgs = getArtist(akbo_image)
+        artist = [(a.split(' ')[-1], ''.join(a.split(' ')[:-1])) for a in artist]
         artist_uri = [to_data_uri(a) for a in artist_imgs]
-        artist = artist or '알 수 없음'
+        artist = artist or ['알 수 없음']
         context = {
             'type' : type,
             'artist': artist,
@@ -129,7 +127,6 @@ def search(request):
     try:
         if type=='artist':
             melon_data = getMelonArtist(item)
-            print(melon_data)
             context['image'] = melon_data['image']
             context['artist'] = melon_data['artist']
             context['tracks'] = melon_data['tracks']
@@ -137,8 +134,10 @@ def search(request):
             melon_data = getMelonInfo(item, artist)
             context['track'] = item
             context['tracks'] = melon_data
+        print('곡 정보 크롤링 성공', context)
     except IndexError as ie:
         context['error'] = 'IndexError'
+        print('곡 정보 크롤링 실패', ie)
 
     return JsonResponse(context)
 
@@ -153,9 +152,9 @@ def getMelonInfo(track, artist):
         tracks = BeautifulSoup(requests.get(q_url, headers=headers).text, 'html.parser').select('table tbody tr')
         data = [{
             'title': soup.select_one('.ellipsis a.fc_gray').text.strip(),
-            'artist': soup.select_one('#artistName > a,fc_mgray').text.strip(),
-            'album': soup.select_one('.ellipsis:not(#artistName) a.fc_mgray').text,
-            } for soup in tracks]
+            'artist': soup.select_one('#artistName > a.fc_mgray').text.strip() if soup.select_one('#artistName > a.fc_mgray') else  'Various Artists',
+            'album': soup.select_one('.ellipsis:not(#artistName) a.fc_mgray').text.strip(),
+            } for soup in tracks[:10]]
     except Exception as e:
         return ('곡 정보 불러오기 실패', e)
     return data
@@ -173,12 +172,13 @@ def getMelonArtist(artist):
         data['image'] = soup.select_one('#artistImgArea img').get('src')
         data['artist'] = soup.select_one('.title_atist').text.replace('아티스트명', '')
         data['tracks'] = [{
-            'title': tr.select_one('.ellipsis a.fc_gray').text,
-            'artist': tr.select_one('#artistName a.fc_mgray').text,
-            'album': tr.select_one('.ellipsis:not(#artistName) a.fc_mgray').text,
+            'title': tr.select_one('.ellipsis a.fc_gray').text.strip(),
+            'artist': tr.select_one('#artistName > a.fc_mgray').text.strip() if soup.select_one('#artistName > a.fc_mgray') else  'Various Artists',
+            'album': tr.select_one('.ellipsis:not(#artistName) a.fc_mgray').text.strip(),
         }
-        for tr in soup.select('#frm div.tb_list.d_song_list.songTypeOne table tbody tr')]
+        for tr in soup.select('#frm div.tb_list.d_song_list.songTypeOne table tbody tr')[:10]]
     except Exception as e:
+        print(data)
         return ('아티스트 정보 불러오기 실패', e)
     return data
 

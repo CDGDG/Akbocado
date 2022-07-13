@@ -157,7 +157,7 @@ def getTitle(img_ori):
     MAX_HEIGHT_DIFF = 1000.0
     MIN_N_MATCHED = 2
 
-    result_idx = find_chars(possible_contours)
+    result_idx = find_chars(possible_contours, MAX_DIAG_MULTIPLYER, MAX_ANGLE_DIFF, MAX_AREA_DIFF,MIN_N_MATCHED, MAX_WIDTH_DIFF, MAX_HEIGHT_DIFF, possible_contours)
 
     # 위 결과를 시각화
     import random

@@ -152,15 +152,6 @@ def getArtist(img_ori):
     for idx_list in result_idx:
         matched_result.append(np.take(possible_contours, idx_list))
 
-    temp_result = np.zeros((height, width, channel), dtype=np.uint8)
-
-
-    for r in matched_result:
-        color = (random.randint(100, 200),random.randint(100, 200), random.randint(100, 200))
-        for d in r:
-            cv2.rectangle(temp_result, pt1=(d['x'], d['y']), pt2=(d['x']+d['w'], d['y']+d['h']), 
-                        color=color, thickness=2)    
-        
     PLATE_WIDTH_PADDING = 1.3
     PLATE_HEIGHT_PADDING = 1.8
 
@@ -238,20 +229,14 @@ def getArtist(img_ori):
             x, y, w, h = cv2.boundingRect(contour)  
         
             area = w * h  
-            ratio = w / h 
             
             if x < plate_min_x: plate_min_x = x
             if y < plate_min_y: plate_min_y = y
             if x + w > plate_max_x: plate_max_x = x + w
             if y + h > plate_max_y: plate_max_y = y + h
                 
-            cv2.rectangle(temp_result, pt1=(x, y), pt2=(x+w, y+h), color=(255, 255,255), thickness=2)
-                    
-        
         img_result = plate_img[plate_min_y:plate_max_y, plate_min_x:plate_max_x]
         
-        plt.subplot(len(plate_imgs), 2, cnt), plt.imshow(rgb(temp_result))
-        cnt += 1
         
     img_result = cv2.GaussianBlur(img_result, ksize=(3, 3), sigmaX=0)
     _, img_result = cv2.threshold(
