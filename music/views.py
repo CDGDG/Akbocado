@@ -17,7 +17,7 @@ from .OCR.lyrics import getLyrics
 from io import BytesIO
 import base64
 
-model = load_model('model/akbo_model_200.h5')
+model = load_model('model/akbo_model_p_melon.h5')
 
 def home(request):
     return render(request, 'home.html')
@@ -199,16 +199,11 @@ def checkAkboImage(request):
     return JsonResponse({'data': akbo})
 
 
-def predict(file):
-    class_names = [0,1]
-    # img = cv2.imread(file)
-    image = Image.fromarray(file)
-    mono8img = image.convert('L')
-    invImg = ops.invert(mono8img)
-    resizeImg = invImg.resize((200, 200))
-    list(resizeImg.getdata())[:10]
-    dataImg = list(map(lambda n: int(n)/255, list(resizeImg.getdata())))
-    data_arr = np.array(dataImg).reshape(1, 200, 200, 1)
+def predict(img):
+    class_names = [0, 1, 2]
+    mono8img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    resizeImg = cv2.resize(mono8img, dsize=(200, 200))
+    data_arr = resizeImg.reshape(1, 200, 200, 1)
     preds = model.predict(data_arr)
 
     return class_names[np.argmax(preds[0])]
