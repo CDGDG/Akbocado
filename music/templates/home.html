@@ -64,8 +64,9 @@
         margin: 50px 0;
     }
     .modal img{
-        width: 100%;
+        width: 80%;
         padding: 20%;
+        margin: 10%;
         border-radius: 1em;
     }
     thead td{
@@ -157,7 +158,6 @@
             data: formdata,
             success:function(response){
                 console.log(response.data)
-                response.data = '멜론'
                 if(response.data == '악보'){
                     $('#akboform').submit();
                 }else if(response.data == '일반'){

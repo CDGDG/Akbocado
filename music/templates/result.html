@@ -321,7 +321,7 @@
                         pit = pitchname[(pitches[i]-4) % 7]
                         $('#notes').append(
                             $('<span class="notespan"></span>').append(
-                                $(`<img src="/static/noteimages/note${beats[i]}.png" data=${beats[i]}>`)
+                                $('<img src="/static/noteimages/note'+beats[i] * (pitches[i]==-1? -1:1)+`.png"data=${beats[i]}>`)
                             ).append(
                                 $(`<span class='pt' data=${pitches[i] - 4}></span>`).text(pit)
                             )
@@ -388,7 +388,10 @@
 
             $ns.css({'background-color': '#4D8E58'})
 
-            sound(freqlist[parseInt(pitch)+4], (2/beat)*1000)
+            if(pitch >= 0){
+                sound(freqlist[parseInt(pitch)+4], (2/beat)*1000)
+            }
+            
             await sleep(2/beat)
 
             $ns.css({'background-color': 'transparent'})
