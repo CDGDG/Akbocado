@@ -1,5 +1,59 @@
 {% extends 'base.html' %}
 
+{% block modal %}
+<div id='mo' style='position: absolute; background-color: rgba(0,0,0,0.5); width: 100%; height:100%; z-index: 20000;display: none;'>
+    <div id="loadingmodal" class="modal" style='z-index:20002;height:400px;width:400px;'>
+        <div class="loading-container">
+            <div class="loading"></div>
+            <div id="loading-text">분석 중</div>
+        </div>        
+    </div>
+    <div id="resultmodal" class="modal result_modal" style='z-index: 20001'>
+        <span class='close'>&times;</span>
+        <img src="" alt="">
+        <h2>분석 결과</h2>
+        <h4 id='result'><p  style='margin:0;min-height:3%;'></p></h4>
+    </div>
+    <div id="artistmodal" class='modal'  style='z-index: 20002'>
+        <span class='close'>&times;</span>
+        <img src="" alt="" id='artistimage'>
+        <h2 id='artistname'></h2>
+        <hr>
+        <div class="table-wrapper">
+            <h4>최신곡</h4>
+            <table class="alt" style='color: white;'>
+                <thead>
+                    <tr>
+                        <th>title</th>
+                        <th>artist</th>
+                    </tr>
+                </thead>
+                <tbody id='artisttrack'>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id='trackmodal' class='modal' style='z-index: 20002'>
+        <span class="close">&times;</span>
+        <h2 id="trackname"></h2>
+        <hr>
+        <div class="table-wrapper">
+            <h4>인기곡</h4>
+            <table class="alt" style='color: white;'>
+                <thead>
+                    <tr>
+                        <th>title</th>
+                        <th>artist</th>
+                    </tr>
+                </thead>
+                <tbody id='titletrack'>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock  %}
+
 {% block main %}
 <div id="banner-wrapper">
     <section id="banner" class="container">
@@ -18,7 +72,7 @@
                                 <li class="first">
                                     <div class="col-12">
                                         <h3>제목</h3>
-                                        <p><a href="javascript:search('track', '{{akbo.title}}', '{{akbo.artist}}')" class='info'>{{akbo.title}}</a></p>
+                                        <p><a href="javascript:search('title', '{{akbo.title}}', '{{akbo.artist}}')" class='info'>{{akbo.title}}</a></p>
                                     </div>
                                 </li>
                                 <li>
@@ -52,9 +106,25 @@
 
 {% block script %}
 <style>
+    .modal::-webkit-scrollbar {
+        width: 10px;  /* 스크롤바의 너비 */
+    }
+    
+    .modal::-webkit-scrollbar-thumb {
+        height: 20%; /* 스크롤바의 길이 */
+        background: #4D8E58; /* 스크롤바의 색상 */
+        
+        border-radius: 20px;
+    }
+
+    .modal::-webkit-scrollbar-track {
+        background: rgba(33, 122, 244, .0);  /*스크롤바 뒷 배경 색상*/
+        margin: 20px 0;
+    }
+
     .modal{
         width: 600px;
-        height:800px;
+        height:600px;
         top: 30%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -65,7 +135,7 @@
         overflow-x: auto;
     }
     .close{
-        position:absolute; 
+        position:fixed; 
         color: white;
         right: 1%;
         font-size: xx-large;
@@ -92,7 +162,7 @@
     .modal td{
         padding: 3%;
         text-overflow: ellipsis;
-        white-space: nowrap;
+        {% comment %} white-space: nowrap; {% endcomment %}
         overflow: hidden;
         width: 50%;
         text-align: center;
@@ -159,7 +229,6 @@
             success: function(response){
                 console.log(response)
 
-                
                 if(type=='artist'){
                     $(`#${type}image`).attr('src', response['image'])
                     $(`#${type}name`).text(response['artist'])
@@ -170,16 +239,19 @@
                             .append($(`<td>${track.artist}</td>`))
                         )
                     }
-                }else if(type=='track'){
-                    $(`#trackimage`).attr('src', response['image'])
+                    $('#artistmodal').show()
+                }else if(type=='title'){
                     $(`#trackname`).text(response['track'])
-                    $(`#trackalbum`).text(response['album'])
-                    $(`#trackrelease`).text(response['release'])
-                    for(let lyric of response['lyrics']){
-                        $('#tracklyrics').append($(`<p style='margin:0;min-height:3%;'>${lyric}</p>`))
+                    for(track of response.tracks){
+                        $('#titletrack').append(
+                            $('<tr></tr>')
+                            .append($(`<td>${track.title}</td>`))
+                            .append($(`<td>${track.artist}</td>`))
+                        )
                     }
+                    $('#trackmodal').show()
                 }
-                $('#mo').toggle()
+                $('#mo').show()
             }
         })
     }

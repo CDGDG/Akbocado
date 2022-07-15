@@ -19,7 +19,7 @@ class User(models.Model):
 class Akbo(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     title = models.CharField(max_length=30, verbose_name='제목')
-    artist = models.CharField(max_length=20, verbose_name='아티스트', null=True)
+    artist = models.CharField(max_length=50, verbose_name='아티스트', null=True)
     lyrics = models.TextField(verbose_name='가사', null=True)
     image = models.FileField(upload_to='akbo_image/', null=False)
 

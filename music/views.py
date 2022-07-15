@@ -17,7 +17,7 @@ from .OCR.lyrics import getLyrics
 from io import BytesIO
 import base64
 
-model = load_model('model/akbo_model_p_melon.h5')
+model = load_model('model/akbo_model_p_nanpa.h5')
 
 def home(request):
     return render(request, 'home.html')

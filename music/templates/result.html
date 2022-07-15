@@ -38,7 +38,7 @@
         <h2 id="trackname"></h2>
         <hr>
         <div class="table-wrapper">
-            <h4>최신곡</h4>
+            <h4>인기곡</h4>
             <table class="alt" style='color: white;'>
                 <thead>
                     <tr>
@@ -371,7 +371,7 @@
         osc.type = "sine" // 그래프 타입 설정 (sine(기본값), saw, triangle 등)
         osc.frequency.value = freq // 주파수(Hz) 입력
         gn = audioCtx.createGain() // 게인노드 생성
-        gn.gain.value = 0.3;
+        gn.gain.value = 0.3; // 볼륨 줄이기
         osc.connect(gn) // 오실레이터와 게인노드 연결
         gn.connect(audioCtx.destination) // 게인노드를 추상화된 출력장치(스피커 등)에 연결
 
